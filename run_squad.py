@@ -181,6 +181,8 @@ def train(args, train_dataset, model, tokenizer):
             model.train()
             batch = tuple(t.to(args.device) for t in batch)
 
+            import pdb; pdb.set_trace()
+
             inputs = {
                 "input_ids": batch[0],
                 "attention_mask": batch[1],

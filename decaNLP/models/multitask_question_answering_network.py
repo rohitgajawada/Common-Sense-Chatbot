@@ -87,6 +87,9 @@ class MultitaskQuestionAnsweringNetwork(nn.Module):
         self.decoder_embeddings.set_embeddings(embeddings)
 
     def forward(self, batch):
+        
+        import pdb; pdb.set_trace()
+        
         context, context_lengths, context_limited, context_elmo    = batch.context,  batch.context_lengths,  batch.context_limited, batch.context_elmo
         question, question_lengths, question_limited, question_elmo = batch.question, batch.question_lengths, batch.question_limited, batch.question_elmo
         answer, answer_lengths, answer_limited       = batch.answer,   batch.answer_lengths,   batch.answer_limited
@@ -106,6 +109,7 @@ class MultitaskQuestionAnsweringNetwork(nn.Module):
         if self.args.glove_and_char:
             context_embedded = self.encoder_embeddings(context)
             question_embedded = self.encoder_embeddings(question)
+            import pdb; pdb.set_trace()
             if self.args.cove:
                 context_embedded = self.project_cove(torch.cat([self.cove(context_embedded[:, :, -300:], context_lengths), context_embedded], -1).detach())
                 question_embedded = self.project_cove(torch.cat([self.cove(question_embedded[:, :, -300:], question_lengths), question_embedded], -1).detach())

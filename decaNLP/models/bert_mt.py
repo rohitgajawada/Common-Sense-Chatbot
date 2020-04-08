@@ -27,9 +27,16 @@ class BertMT(nn.Module):
         self.model = bert_model_class.from_pretrained(self.bert_pretrained_weights)  
         
     def forward(self, batch):
-        pass
+        
+        context, context_lengths, context_limited, context_elmo = batch.context,  batch.context_lengths,  batch.context_limited, batch.context_elmo
+        
+        question, question_lengths, question_limited, question_elmo = batch.question, batch.question_lengths, batch.question_limited, batch.question_elmo
+        
+        answer, answer_lengths, answer_limited       = batch.answer,   batch.answer_lengths,   batch.answer_limited
+        
+        oov_to_limited_idx, limited_idx_to_full_idx  = batch.oov_to_limited_idx, batch.limited_idx_to_full_idx
     
         # Encode text
-        input_ids = torch.tensor([tokenizer.encode("Here is some text to encode", add_special_tokens=True)])  # Add special tokens takes care of adding [CLS], [SEP], <s>... tokens in the right way for each model.
+        context_ids = torch.tensor([self.tokenizer.encode(context, add_special_tokens=True)])  
     
         last_hidden_states = model(input_ids)[0]

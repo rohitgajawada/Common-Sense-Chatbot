@@ -82,12 +82,17 @@ def prepare_data(args, field, logger):
         if args.vocab_tasks is not None and task in args.vocab_tasks:
             vocab_sets.extend(split) 
 
+    import pdb; pdb.set_trace()
     if args.load is None:
         logger.info(f'Getting pretrained word vectors')
         char_vectors = torchtext.vocab.CharNGram(cache=args.embeddings)
+        print("HI1")
         glove_vectors = torchtext.vocab.GloVe(cache=args.embeddings)
+        print("HI2")
         vectors = [glove_vectors]
+        print("HI3")
         vocab_sets = (train_sets + val_sets) if len(vocab_sets) == 0 else vocab_sets
+        print("HI4")
         logger.info(f'Building vocabulary')
         FIELD.build_vocab(*vocab_sets, max_size=args.max_effective_vocab, vectors=vectors)
 
