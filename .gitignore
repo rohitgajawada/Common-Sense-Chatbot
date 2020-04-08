@@ -1,0 +1,7 @@
+.vscode/
+decaNLP/.embeddings/
+decaNLP/data/
+decaNLP/models/__pycache__/
+decaNLP/multiprocess/__pycache__/
+decaNLP/results/
+decaNLP/__pycache__/
