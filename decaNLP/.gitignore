@@ -1,0 +1,7 @@
+.vscode/
+.embeddings/
+data/
+models/__pycache__/
+multiprocess/__pycache__/
+results/
+__pycache__/

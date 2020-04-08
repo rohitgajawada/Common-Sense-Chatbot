@@ -19,7 +19,7 @@ class BertMT(nn.Module):
         self.encoder_embeddings = Embedding(field, args.dimension, 
                 dropout=args.dropout_ratio, project=not args.cove)
         
-        self.bert_model_class = BertModel
+        self.bert_model_class = BertForQuestionAnswering
         self.bert_tokenizer = BertTokenizer
         self.bert_pretrained_weights = 'bert-base-uncased'
         
