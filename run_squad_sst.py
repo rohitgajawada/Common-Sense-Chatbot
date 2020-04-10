@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#TODO: keep the data directories separate for each 
+#TODO: make sure multi-task model gets loaded and not some other shit
 
 import argparse
 import glob
@@ -63,6 +65,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+#TODO: CHECK THIS MODEL STUFF
 MODEL_QA_CONFIG_CLASSES = list(MODEL_FOR_QUESTION_ANSWERING_MAPPING.keys())
 MODEL_QA_TYPES = tuple(conf.model_type for conf in MODEL_QA_CONFIG_CLASSES)
 ALL_QA_MODELS = sum((tuple(conf.pretrained_config_archive_map.keys()) for conf in MODEL_QA_CONFIG_CLASSES), (),)
@@ -210,9 +213,14 @@ def train(args, train_dataset, model, tokenizer):
                 if args.logging_steps > 0 and global_step % args.logging_steps == 0:
                     # Only evaluate when single GPU otherwise metrics may not average well
                     if args.evaluate_during_training:
-                        results = evaluate(args, model, tokenizer)
-                        for key, value in results.items():
-                            tb_writer.add_scalar("eval_{}".format(key), value, global_step)
+                        results_QA = QA_evaluate(args, model, tokenizer)
+                        for key, value in results_QA.items():
+                            tb_writer.add_scalar("QA_eval_{}".format(key), value, global_step)
+                        
+                        results_SST = GLUE_evaluate(args, model, tokenizer)
+                        for key, value in results_SST.items():
+                            tb_writer.add_scalar("SST_eval_{}".format(key), value, global_step)  
+                            
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
                     tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
                     logging_loss = tr_loss
@@ -248,7 +256,7 @@ def train(args, train_dataset, model, tokenizer):
 def GLUE_evaluate(args, model, tokenizer, prefix=""):
     # Loop to handle MNLI double evaluation (matched, mis-matched)
     eval_task_names = ("mnli", "mnli-mm") if args.task_name == "mnli" else (args.task_name,)
-    eval_outputs_dirs = (args.output_dir, args.output_dir + "-MM") if args.task_name == "mnli" else (args.output_dir,)
+    eval_outputs_dirs = (args.output_dir + '_' + args.task_name, args.output_dir + '_' + args.task_name + "-MM") if args.task_name == "mnli" else (args.output_dir + '_' + args.task_name,)
 
     results = {}
     for eval_task, eval_output_dir in zip(eval_task_names, eval_outputs_dirs):
@@ -302,7 +310,7 @@ def GLUE_evaluate(args, model, tokenizer, prefix=""):
         result = compute_metrics(eval_task, preds, out_label_ids)
         results.update(result)
 
-        output_eval_file = os.path.join(eval_output_dir, prefix, "eval_results.txt")
+        output_eval_file = os.path.join(eval_output_dir, prefix, '_' + args.task_name + "_eval_results.txt")
         with open(output_eval_file, "w") as writer:
             logger.info("***** Eval results {} *****".format(prefix))
             for key in sorted(result.keys()):
@@ -398,6 +406,10 @@ def GLUE_load_and_cache_examples(args, task, tokenizer, evaluate=False):
     processor = processors[task]()
     output_mode = output_modes[task]
     # Load data features from cache or dataset file
+    
+    if task == 'sst':
+        data_dir = args.sst_data_dir
+    
     cached_features_file = os.path.join(
         args.data_dir,
         "cached_{}_{}_{}_{}".format(
@@ -429,7 +441,7 @@ def GLUE_load_and_cache_examples(args, task, tokenizer, evaluate=False):
         
         logger.info("Saving features into cached file %s", cached_features_file)
         torch.save(features, cached_features_file)
-
+    
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
     all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
@@ -445,10 +457,10 @@ def GLUE_load_and_cache_examples(args, task, tokenizer, evaluate=False):
 def squad_load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=False):
 
     # Load data features from cache or dataset file
-    input_dir = args.data_dir if args.data_dir else "."
+    input_dir = args.squad_data_dir if args.squad_data_dir else "."
     cached_features_file = os.path.join(
         input_dir,
-        "cached_{}_{}_{}".format(
+        "squad_cached_{}_{}_{}".format(
             "dev" if evaluate else "train",
             list(filter(None, args.model_name_or_path.split("/"))).pop(),
             str(args.max_seq_length),
@@ -467,24 +479,25 @@ def squad_load_and_cache_examples(args, tokenizer, evaluate=False, output_exampl
     else:
         logger.info("Creating features from dataset file at %s", input_dir)
 
-        if not args.data_dir and ((evaluate and not args.predict_file) or (not evaluate and not args.train_file)):
+        if not args.squad_data_dir and ((evaluate and not args.predict_file) or (not evaluate and not args.train_file)):
             try:
                 import tensorflow_datasets as tfds
             except ImportError:
-                raise ImportError("If not data_dir is specified, tensorflow_datasets needs to be installed.")
+                raise ImportError("If not squad data_dir is specified, tensorflow_datasets needs to be installed.")
 
             if args.version_2_with_negative:
                 logger.warn("tensorflow_datasets does not handle version 2 of SQuAD.")
 
             tfds_examples = tfds.load("squad")
             examples = SquadV1Processor().get_examples_from_dataset(tfds_examples, evaluate=evaluate)
+            
         else:
             logger.info("Using SQUAD Processor")
             processor = SquadV2Processor() if args.version_2_with_negative else SquadV1Processor()
             if evaluate:
-                examples = processor.get_dev_examples(args.data_dir, filename=args.predict_file)
+                examples = processor.get_dev_examples(args.squad_data_dir, filename=args.predict_file)
             else:
-                examples = processor.get_train_examples(args.data_dir, filename=args.train_file)
+                examples = processor.get_train_examples(args.squad_data_dir, filename=args.train_file)
 
         features, dataset = squad_convert_examples_to_features(
             examples=examples,
@@ -534,21 +547,36 @@ def main():
 
     # Other parameters
     parser.add_argument(
-        "--data_dir",
+        "--squad_data_dir",
         default=None,
         type=str,
-        help="The input data dir. Should contain the .json files for the task."
+        help="The input squad data dir. Should contain the .json files for the task."
         + "If no data dir or train/predict files are specified, will run with tensorflow_datasets.",
     )
     parser.add_argument(
-        "--train_file",
+        "--sst_data_dir",
+        default=None,
+        type=str,
+        help="The input sst data dir. Should contain the .json files for the task."
+        + "If no data dir or train/predict files are specified, will run with tensorflow_datasets.",
+    )
+    parser.add_argument(
+        "--mnli_data_dir",
+        default=None,
+        type=str,
+        help="The input mnli data dir. Should contain the .json files for the task."
+        + "If no data dir or train/predict files are specified, will run with tensorflow_datasets.",
+    )
+    
+    parser.add_argument(
+        "--squad_train_file",
         default=None,
         type=str,
         help="The input training file. If a data dir is specified, will look for the file there"
         + "If no data dir or train/predict files are specified, will run with tensorflow_datasets.",
     )
     parser.add_argument(
-        "--predict_file",
+        "--squad_predict_file",
         default=None,
         type=str,
         help="The input evaluation file. If a data dir is specified, will look for the file there"
@@ -669,7 +697,7 @@ def main():
     
     parser.add_argument(
         "--task_name",
-        default='SST',
+        default='sst',
         type=str,
         required=True,
         help="The name of the task to train selected in the list: " + ", ".join(processors.keys()),
@@ -747,7 +775,8 @@ def main():
         squad_train_dataset = squad_load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=False)
         SST_train_dataset = GLUE_load_and_cache_examples(args, args.task_name, tokenizer, evaluate=False)
         
-        global_step, tr_loss = train(args, squad_train_dataset, model, tokenizer)
+        #Sending concat datasets for different tasks
+        global_step, tr_loss = train(args, [squad_train_dataset, SST_train_dataset], model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
     # Save the trained model and the tokenizer
@@ -773,6 +802,7 @@ def main():
         model.to(args.device)
 
     # Evaluation - we can ask to evaluate all the checkpoints (sub-directories) in a directory
+    # SQUAD evaluation
     results_QA = {}
     if args.do_eval:
         if args.do_train:
@@ -804,8 +834,9 @@ def main():
 
     logger.info("Results_QA: {}".format(results_QA))
     
+    #SST evaluation
     results_SST = {}
-    if args.do_eval and args.local_rank in [-1, 0]:
+    if args.do_eval:
         checkpoints = [args.output_dir]
         if args.eval_all_checkpoints:
             checkpoints = list(
