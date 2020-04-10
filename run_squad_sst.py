@@ -409,9 +409,11 @@ def GLUE_load_and_cache_examples(args, task, tokenizer, evaluate=False):
     
     if task == 'sst':
         data_dir = args.sst_data_dir
+    elif task == 'mnli':
+        data_dir = args.mnli_data_dir
     
     cached_features_file = os.path.join(
-        args.data_dir,
+        data_dir,
         "cached_{}_{}_{}_{}".format(
             "dev" if evaluate else "train",
             list(filter(None, args.model_name_or_path.split("/"))).pop(),
@@ -423,10 +425,10 @@ def GLUE_load_and_cache_examples(args, task, tokenizer, evaluate=False):
         logger.info("Loading features from cached file %s", cached_features_file)
         features = torch.load(cached_features_file)
     else:
-        logger.info("Creating features from dataset file at %s", args.data_dir)
+        logger.info("Creating features from dataset file at %s", data_dir)
         label_list = processor.get_labels()
         examples = (
-            processor.get_dev_examples(args.data_dir) if evaluate else processor.get_train_examples(args.data_dir)
+            processor.get_dev_examples(data_dir) if evaluate else processor.get_train_examples(data_dir)
         )
         features = convert_examples_to_features(
             examples,
@@ -434,7 +436,7 @@ def GLUE_load_and_cache_examples(args, task, tokenizer, evaluate=False):
             label_list=label_list,
             max_length=args.max_seq_length,
             output_mode=output_mode,
-            pad_on_left=bool(args.model_type in ["xlnet"]),  # pad on the left for xlnet
+            pad_on_left=False,
             pad_token=tokenizer.pad_token_id,
             pad_token_segment_id=tokenizer.pad_token_type_id,
         )

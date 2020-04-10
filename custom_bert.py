@@ -36,10 +36,10 @@ class BertForMT(BertPreTrainedModel):
         start_positions=None,
         end_positions=None,
         labels=None,
-        task='QA'
+        task='qa'
     ):
 
-        if task == 'QA':
+        if task == 'qa':
             outputs = self.bert(
                 input_ids,
                 attention_mask=attention_mask,
@@ -76,7 +76,7 @@ class BertForMT(BertPreTrainedModel):
 
             return outputs  # (loss), start_logits, end_logits, (hidden_states), (attentions)
         
-        elif task == 'SST' or task == 'MNLI':
+        elif task == 'sst' or task == 'mnli':
             
             outputs = self.bert(
                 input_ids,
@@ -91,9 +91,9 @@ class BertForMT(BertPreTrainedModel):
 
             pooled_output = self.dropout(pooled_output)
             
-            if task == 'SST':
+            if task == 'sst':
                 logits = self.sst_classifier(pooled_output)
-            elif task == 'MNLI':
+            elif task == 'mnli':
                 logits = self.mnli_classifier(pooled_output)
 
             outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
