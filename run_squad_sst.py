@@ -65,16 +65,6 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-#TODO: CHECK THIS MODEL STUFF
-MODEL_QA_CONFIG_CLASSES = list(MODEL_FOR_QUESTION_ANSWERING_MAPPING.keys())
-MODEL_QA_TYPES = tuple(conf.model_type for conf in MODEL_QA_CONFIG_CLASSES)
-ALL_QA_MODELS = sum((tuple(conf.pretrained_config_archive_map.keys()) for conf in MODEL_QA_CONFIG_CLASSES), (),)
-
-MODEL_SEQ_CONFIG_CLASSES = list(MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING.keys())
-MODEL_SEQ_TYPES = tuple(conf.model_type for conf in MODEL_SEQ_CONFIG_CLASSES)
-
-ALL_MODELS = sum((tuple(conf.pretrained_config_archive_map.keys()) for conf in MODEL_SEQ_CONFIG_CLASSES), (),)
-
 def set_seed(args):
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -544,14 +534,14 @@ def main():
         default='bert',
         type=str,
         required=True,
-        help="Model type selected in the list: " + ", ".join(MODEL_QA_TYPES),
+        help="Model type selected"
     )
     parser.add_argument(
         "--model_name_or_path",
         default='bert-base-uncased',
         type=str,
         required=True,
-        help="Path to pre-trained model or shortcut name selected in the list: " + ", ".join(ALL_MODELS),
+        help="Path to pre-trained model or shortcut name selected"
     )
     parser.add_argument(
         "--output_dir",
