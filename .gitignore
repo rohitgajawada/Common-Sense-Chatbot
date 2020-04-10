@@ -5,3 +5,8 @@ decaNLP/models/__pycache__/
 decaNLP/multiprocess/__pycache__/
 decaNLP/results/
 decaNLP/__pycache__/
+SST-2.zip
+cached_train_bert-base-uncased_384
+runs/
+temp.py
+
