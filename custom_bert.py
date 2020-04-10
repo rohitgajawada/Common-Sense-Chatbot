@@ -76,7 +76,7 @@ class BertForMT(BertPreTrainedModel):
 
             return outputs  # (loss), start_logits, end_logits, (hidden_states), (attentions)
         
-        elif task == 'sst' or task == 'mnli':
+        elif task == 'sst-2' or task == 'mnli':
             
             outputs = self.bert(
                 input_ids,
@@ -91,7 +91,7 @@ class BertForMT(BertPreTrainedModel):
 
             pooled_output = self.dropout(pooled_output)
             
-            if task == 'sst':
+            if task == 'sst-2':
                 logits = self.sst_classifier(pooled_output)
             elif task == 'mnli':
                 logits = self.mnli_classifier(pooled_output)

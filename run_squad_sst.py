@@ -87,8 +87,11 @@ def to_list(tensor):
     return tensor.detach().cpu().tolist()
 
 
-def train(args, train_dataset, model, tokenizer):
+def train(args, concat_train_dataset, model, tokenizer):
     """ Train the model """
+    
+    #TODO: SPLIT DATASET AND DO THE CONCAT MULTI TASK BATCHING
+    
     tb_writer = SummaryWriter()
 
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
@@ -167,6 +170,7 @@ def train(args, train_dataset, model, tokenizer):
     # Added here for reproductibility
     set_seed(args)
 
+    #TODO BATCHER
     for _ in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")
         for step, batch in enumerate(epoch_iterator):
@@ -181,6 +185,8 @@ def train(args, train_dataset, model, tokenizer):
 
             # import pdb; pdb.set_trace()
 
+            #TODO: depending on the task change the input format because the batch would be for that task
+
             inputs = {
                 "input_ids": batch[0],
                 "attention_mask": batch[1],
@@ -188,6 +194,9 @@ def train(args, train_dataset, model, tokenizer):
                 "start_positions": batch[3],
                 "end_positions": batch[4],
             }
+            
+            #TODO
+            inputs["task"] = batch_task
 
             outputs = model(**inputs)
             # model outputs are always tuple in transformers (see doc)
@@ -217,9 +226,14 @@ def train(args, train_dataset, model, tokenizer):
                         for key, value in results_QA.items():
                             tb_writer.add_scalar("QA_eval_{}".format(key), value, global_step)
                         
-                        results_SST = GLUE_evaluate(args, model, tokenizer)
+                        results_SST = GLUE_evaluate(args, model, tokenizer, task_name='sst-2')
                         for key, value in results_SST.items():
-                            tb_writer.add_scalar("SST_eval_{}".format(key), value, global_step)  
+                            tb_writer.add_scalar("SST_eval_{}".format(key), value, global_step) 
+                            
+                        if args.do_mnli:
+                            results_MNLI = GLUE_evaluate(args, model, tokenizer, task_name='mnli')
+                            for key, value in results_MNLI.items():
+                                tb_writer.add_scalar("MNLI_eval_{}".format(key), value, global_step)  
                             
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
                     tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
@@ -253,10 +267,10 @@ def train(args, train_dataset, model, tokenizer):
 
     return global_step, tr_loss / global_step
 
-def GLUE_evaluate(args, model, tokenizer, prefix=""):
+def GLUE_evaluate(args, model, tokenizer, task_name, prefix=""):
     # Loop to handle MNLI double evaluation (matched, mis-matched)
-    eval_task_names = ("mnli", "mnli-mm") if args.task_name == "mnli" else (args.task_name,)
-    eval_outputs_dirs = (args.output_dir + '_' + args.task_name, args.output_dir + '_' + args.task_name + "-MM") if args.task_name == "mnli" else (args.output_dir + '_' + args.task_name,)
+    eval_task_names = ("mnli", "mnli-mm") if task_name == "mnli" else (task_name,)
+    eval_outputs_dirs = (args.output_dir + '_' + task_name, args.output_dir + '_' + task_name + "-MM") if task_name == "mnli" else (args.output_dir + '_' + task_name,)
 
     results = {}
     for eval_task, eval_output_dir in zip(eval_task_names, eval_outputs_dirs):
@@ -289,7 +303,7 @@ def GLUE_evaluate(args, model, tokenizer, prefix=""):
             with torch.no_grad():
                 inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
                 inputs["token_type_ids"] = batch[2]
-                inputs["task"] = args.task_name
+                inputs["task"] = task_name
                 
                 outputs = model(**inputs)
                 tmp_eval_loss, logits = outputs[:2]
@@ -310,7 +324,7 @@ def GLUE_evaluate(args, model, tokenizer, prefix=""):
         result = compute_metrics(eval_task, preds, out_label_ids)
         results.update(result)
 
-        output_eval_file = os.path.join(eval_output_dir, prefix, '_' + args.task_name + "_eval_results.txt")
+        output_eval_file = os.path.join(eval_output_dir, prefix, '_' + task_name + "_eval_results.txt")
         with open(output_eval_file, "w") as writer:
             logger.info("***** Eval results {} *****".format(prefix))
             for key in sorted(result.keys()):
@@ -407,7 +421,7 @@ def GLUE_load_and_cache_examples(args, task, tokenizer, evaluate=False):
     output_mode = output_modes[task]
     # Load data features from cache or dataset file
     
-    if task == 'sst':
+    if task == 'sst-2':
         data_dir = args.sst_data_dir
     elif task == 'mnli':
         data_dir = args.mnli_data_dir
@@ -481,7 +495,7 @@ def squad_load_and_cache_examples(args, tokenizer, evaluate=False, output_exampl
     else:
         logger.info("Creating features from dataset file at %s", input_dir)
 
-        if not args.squad_data_dir and ((evaluate and not args.predict_file) or (not evaluate and not args.train_file)):
+        if not args.squad_data_dir and ((evaluate and not args.squad_predict_file) or (not evaluate and not args.squad_train_file)):
             try:
                 import tensorflow_datasets as tfds
             except ImportError:
@@ -497,9 +511,9 @@ def squad_load_and_cache_examples(args, tokenizer, evaluate=False, output_exampl
             logger.info("Using SQUAD Processor")
             processor = SquadV2Processor() if args.version_2_with_negative else SquadV1Processor()
             if evaluate:
-                examples = processor.get_dev_examples(args.squad_data_dir, filename=args.predict_file)
+                examples = processor.get_dev_examples(args.squad_data_dir, filename=args.squad_predict_file)
             else:
-                examples = processor.get_train_examples(args.squad_data_dir, filename=args.train_file)
+                examples = processor.get_train_examples(args.squad_data_dir, filename=args.squad_train_file)
 
         features, dataset = squad_convert_examples_to_features(
             examples=examples,
@@ -584,6 +598,14 @@ def main():
         help="The input evaluation file. If a data dir is specified, will look for the file there"
         + "If no data dir or train/predict files are specified, will run with tensorflow_datasets.",
     )
+    
+    parser.add_argument(
+        "--do_mnli",
+        default=False,
+        type=bool,
+        help="If we do mnli along with squad and sst as well",
+    )
+    
     parser.add_argument(
         "--config_name", default="", type=str, help="Pretrained config name or path if not the same as model_name"
     )
@@ -698,14 +720,6 @@ def main():
     )
     
     parser.add_argument(
-        "--task_name",
-        default='sst',
-        type=str,
-        required=True,
-        help="The name of the task to train selected in the list: " + ", ".join(processors.keys()),
-    )
-    
-    parser.add_argument(
         "--overwrite_cache", action="store_true", help="Overwrite the cached training and evaluation sets"
     )
     parser.add_argument("--seed", type=int, default=42, help="random seed for initialization")
@@ -775,10 +789,17 @@ def main():
     # Training
     if args.do_train:
         squad_train_dataset = squad_load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=False)
-        SST_train_dataset = GLUE_load_and_cache_examples(args, args.task_name, tokenizer, evaluate=False)
+        SST_train_dataset = GLUE_load_and_cache_examples(args, 'sst-2', tokenizer, evaluate=False)
+        if args.do_mnli:
+            MNLI_train_dataset = GLUE_load_and_cache_examples(args, 'mnli', tokenizer, evaluate=False)
+        
+        if args.do_mnli:
+            concat_datasets = [squad_train_dataset, SST_train_dataset, MNLI_train_dataset]
+        else:
+            concat_datasets = [squad_train_dataset, SST_train_dataset]
         
         #Sending concat datasets for different tasks
-        global_step, tr_loss = train(args, [squad_train_dataset, SST_train_dataset], model, tokenizer)
+        global_step, tr_loss = train(args, concat_datasets, model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
     # Save the trained model and the tokenizer
@@ -852,12 +873,39 @@ def main():
 
             model = BertForMT.from_pretrained(checkpoint)
             model.to(args.device)
-            result = GLUE_evaluate(args, model, tokenizer, prefix=prefix)
+            result = GLUE_evaluate(args, model, tokenizer, task_name='sst-2', prefix=prefix)
             result = dict((k + "_{}".format(global_step), v) for k, v in result.items())
             results_SST.update(result)
 
-    logger.info("Results_SST: {}".format(results_QA))
-    return [results_QA, results_SST]
+    logger.info("Results_SST: {}".format(results_SST))
+
+    #MNLI evaluation
+    if args.do_mnli:
+        results_MNLI = {}
+        if args.do_eval:
+            checkpoints = [args.output_dir]
+            if args.eval_all_checkpoints:
+                checkpoints = list(
+                    os.path.dirname(c) for c in sorted(glob.glob(args.output_dir + "/**/" + WEIGHTS_NAME, recursive=True))
+                )
+                logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce logging
+            logger.info("Evaluate the following checkpoints: %s", checkpoints)
+            for checkpoint in checkpoints:
+                global_step = checkpoint.split("-")[-1] if len(checkpoints) > 1 else ""
+                prefix = checkpoint.split("/")[-1] if checkpoint.find("checkpoint") != -1 else ""
+
+                model = BertForMT.from_pretrained(checkpoint)
+                model.to(args.device)
+                result = GLUE_evaluate(args, model, tokenizer, task_name='mnli', prefix=prefix)
+                result = dict((k + "_{}".format(global_step), v) for k, v in result.items())
+                results_MNLI.update(result)
+
+        logger.info("Results_MNLI: {}".format(results_MNLI))
+        
+        return [results_QA, results_SST, results_MNLI]
+    
+    else:
+        return [results_QA, results_SST]
 
 
 if __name__ == "__main__":
