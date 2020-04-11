@@ -20,8 +20,8 @@ class BertForMT(BertPreTrainedModel):
         self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
         
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
-        self.sst_classifier = nn.Linear(config.hidden_size, self.config.num_labels)
-        self.mnli_classifier = nn.Linear(config.hidden_size, self.config.num_labels)
+        self.sst_classifier = nn.Linear(config.hidden_size, 2)
+        self.mnli_classifier = nn.Linear(config.hidden_size, 3)
         
         self.init_weights()
 
