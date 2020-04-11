@@ -1,10 +1,21 @@
 import torch
-from torch.utils.data.sampler import RandomSampler
+from torch.utils.data import RandomSampler
+from torchsampler import ImbalancedDatasetSampler
 
 
-class BatchSchedulerSampler(torch.utils.data.sampler.Sampler):
+class ExampleImbalancedDatasetSampler(ImbalancedDatasetSampler):
     """
-    iterate over tasks and provide a random batch per task in each mini-batch
+    ImbalancedDatasetSampler is taken from https://github.com/ufoym/imbalanced-dataset-sampler/blob/master/sampler.py
+    In order to be able to show the usage of ImbalancedDatasetSampler in this example I am editing the _get_label
+    to fit my datasets
+    """
+    def _get_label(self, dataset, idx):
+        return dataset.samples[idx].item()
+
+
+class BalancedBatchSchedulerSampler(torch.utils.data.sampler.Sampler):
+    """
+    iterate over tasks and provide a balanced batch per task in each mini-batch
     """
     def __init__(self, dataset, batch_size):
         self.dataset = dataset
@@ -20,7 +31,12 @@ class BatchSchedulerSampler(torch.utils.data.sampler.Sampler):
         datasets_length = []
         for dataset_idx in range(self.number_of_datasets):
             cur_dataset = self.dataset.datasets[dataset_idx]
-            sampler = RandomSampler(cur_dataset)
+            if dataset_idx == 0:
+                # the first dataset is kept at RandomSampler
+                sampler = RandomSampler(cur_dataset)
+            else:
+                # the second unbalanced dataset is changed
+                sampler = ExampleImbalancedDatasetSampler(cur_dataset)
             samplers_list.append(sampler)
             cur_sampler_iterator = sampler.__iter__()
             sampler_iterators.append(cur_sampler_iterator)
@@ -47,8 +63,7 @@ class BatchSchedulerSampler(torch.utils.data.sampler.Sampler):
                         if i == largest_dataset_index:
                             # largest dataset iterator is done we can break
                             samples_to_grab = len(cur_samples)  # adjusting the samples_to_grab
-                            # got to the end of iterator - extend final list and continue to next task if possible
-                            break
+                            break  # got to the end of iterator - extend final list and continue to next task
                         else:
                             # restart the iterator - we want more samples until finishing with the largest dataset
                             sampler_iterators[i] = samplers_list[i].__iter__()
