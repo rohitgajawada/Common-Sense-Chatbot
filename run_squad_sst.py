@@ -29,6 +29,7 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, TensorDataset
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
+from mlt_batch_scheduler import BatchSchedulerSampler
 
 from transformers import (
     MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING,
@@ -86,7 +87,8 @@ def train(args, concat_train_dataset, model, tokenizer):
 
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
     train_sampler = RandomSampler(train_dataset)
-    train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
+    #train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
+    train_dataloader = DataLoader(train_dataset, sampler=BatchSchedulerSampler(train_dataset, batch_size=args.train_batch_size), batch_size=args.train_batch_size, shuffle=False)
 
     if args.max_steps > 0:
         t_total = args.max_steps
@@ -272,7 +274,8 @@ def GLUE_evaluate(args, model, tokenizer, task_name, prefix=""):
         args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
         # Note that DistributedSampler samples randomly
         eval_sampler = SequentialSampler(eval_dataset)
-        eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+        #eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+        eval_dataloader = DataLoader(eval_dataset, sampler=BatchSchedulerSampler(eval_dataset, batch_size=args.eval_batch_size), batch_size=args.eval_batch_size, shuffle=False)
 
         # multi-gpu eval
         if args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
@@ -333,7 +336,8 @@ def QA_evaluate(args, model, tokenizer, prefix=""):
 
     # Note that DistributedSampler samples randomly
     eval_sampler = SequentialSampler(dataset)
-    eval_dataloader = DataLoader(dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+    #eval_dataloader = DataLoader(dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+    eval_dataloader = DataLoader(eval_dataset, sampler=BatchSchedulerSampler(eval_dataset, batch_size=args.eval_batch_size), batch_size=args.eval_batch_size, shuffle=False)
 
     # multi-gpu evaluate
     if args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
