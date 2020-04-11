@@ -29,7 +29,7 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, TensorDataset
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
-from mlt_batch_scheduler import BatchSchedulerSampler
+from mlt_batch_scheduler import BalancedBatchSchedulerSampler
 
 from transformers import (
     MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING,
@@ -88,7 +88,7 @@ def train(args, concat_train_dataset, model, tokenizer):
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
     train_sampler = RandomSampler(train_dataset)
     #train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
-    train_dataloader = DataLoader(train_dataset, sampler=BatchSchedulerSampler(train_dataset, batch_size=args.train_batch_size), batch_size=args.train_batch_size, shuffle=False)
+    train_dataloader = DataLoader(train_dataset, sampler=BalancedBatchSchedulerSampler(train_dataset, batch_size=args.train_batch_size), batch_size=args.train_batch_size, shuffle=False)
 
     if args.max_steps > 0:
         t_total = args.max_steps
@@ -178,16 +178,20 @@ def train(args, concat_train_dataset, model, tokenizer):
             # import pdb; pdb.set_trace()
 
             #TODO: depending on the task change the input format because the batch would be for that task
-
-            inputs = {
-                "input_ids": batch[0],
-                "attention_mask": batch[1],
-                "token_type_ids": batch[2],
-                "start_positions": batch[3],
-                "end_positions": batch[4],
-            }
+            if batch_task == 'QA':
+                inputs = {
+                    "input_ids": batch[0],
+                    "attention_mask": batch[1],
+                    "token_type_ids": batch[2],
+                    "start_positions": batch[3],
+                    "end_positions": batch[4],
+                }
             
             #TODO
+            if batch_task == 'GLUE':
+                inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
+                inputs["token_type_ids"] = batch[2]
+
             inputs["task"] = batch_task
 
             outputs = model(**inputs)
@@ -275,7 +279,7 @@ def GLUE_evaluate(args, model, tokenizer, task_name, prefix=""):
         # Note that DistributedSampler samples randomly
         eval_sampler = SequentialSampler(eval_dataset)
         #eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
-        eval_dataloader = DataLoader(eval_dataset, sampler=BatchSchedulerSampler(eval_dataset, batch_size=args.eval_batch_size), batch_size=args.eval_batch_size, shuffle=False)
+        eval_dataloader = DataLoader(eval_dataset, sampler=BalancedBatchSchedulerSampler(eval_dataset, batch_size=args.eval_batch_size), batch_size=args.eval_batch_size, shuffle=False)
 
         # multi-gpu eval
         if args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
@@ -337,7 +341,7 @@ def QA_evaluate(args, model, tokenizer, prefix=""):
     # Note that DistributedSampler samples randomly
     eval_sampler = SequentialSampler(dataset)
     #eval_dataloader = DataLoader(dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
-    eval_dataloader = DataLoader(eval_dataset, sampler=BatchSchedulerSampler(eval_dataset, batch_size=args.eval_batch_size), batch_size=args.eval_batch_size, shuffle=False)
+    eval_dataloader = DataLoader(eval_dataset, sampler=BalancedBatchSchedulerSampler(eval_dataset, batch_size=args.eval_batch_size), batch_size=args.eval_batch_size, shuffle=False)
 
     # multi-gpu evaluate
     if args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
