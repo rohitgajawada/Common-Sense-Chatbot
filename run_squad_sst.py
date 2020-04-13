@@ -26,10 +26,12 @@ import timeit
 
 import numpy as np
 import torch
+from torch.utils.data.dataset import ConcatDataset
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, TensorDataset
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
 from mlt_batch_scheduler import BalancedBatchSchedulerSampler
+from multi_task_batch_scheduler import BatchSchedulerSampler
 
 from transformers import (
     MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING,
@@ -86,9 +88,9 @@ def train(args, concat_train_dataset, model, tokenizer):
     tb_writer = SummaryWriter()
 
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
-    train_sampler = RandomSampler(train_dataset)
+    #train_sampler = RandomSampler(train_dataset)
     #train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
-    train_dataloader = DataLoader(train_dataset, sampler=BalancedBatchSchedulerSampler(train_dataset, batch_size=args.train_batch_size), batch_size=args.train_batch_size, shuffle=False)
+    train_dataloader = DataLoader(concat_train_dataset, sampler=BatchSchedulerSampler(concat_train_dataset, batch_size=args.train_batch_size), batch_size=args.train_batch_size, shuffle=False)
 
     if args.max_steps > 0:
         t_total = args.max_steps
@@ -166,7 +168,10 @@ def train(args, concat_train_dataset, model, tokenizer):
     for _ in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")
         for step, batch in enumerate(epoch_iterator):
-
+            if step%2==0:
+              batch_task = 'QA'
+            else:
+              batch_task = 'GLUE'
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
@@ -792,9 +797,9 @@ def main():
             MNLI_train_dataset = GLUE_load_and_cache_examples(args, 'mnli', tokenizer, evaluate=False)
         
         if args.do_mnli:
-            concat_datasets = [squad_train_dataset, SST_train_dataset, MNLI_train_dataset]
+            concat_datasets = ConcatDataset([squad_train_dataset, SST_train_dataset, MNLI_train_dataset])
         else:
-            concat_datasets = [squad_train_dataset, SST_train_dataset]
+            concat_datasets = ConcatDataset([squad_train_dataset, SST_train_dataset])
         
         #Sending concat datasets for different tasks
         global_step, tr_loss = train(args, concat_datasets, model, tokenizer)
