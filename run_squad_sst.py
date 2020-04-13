@@ -169,9 +169,9 @@ def train(args, concat_train_dataset, model, tokenizer):
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")
         for step, batch in enumerate(epoch_iterator):
             if step%2==0:
-              batch_task = 'QA'
+              batch_task = 'qa'
             else:
-              batch_task = 'GLUE'
+              batch_task = 'sst-2'
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
@@ -183,7 +183,7 @@ def train(args, concat_train_dataset, model, tokenizer):
             # import pdb; pdb.set_trace()
 
             #TODO: depending on the task change the input format because the batch would be for that task
-            if batch_task == 'QA':
+            if batch_task == 'qa':
                 inputs = {
                     "input_ids": batch[0],
                     "attention_mask": batch[1],
@@ -193,7 +193,7 @@ def train(args, concat_train_dataset, model, tokenizer):
                 }
             
             #TODO
-            if batch_task == 'GLUE':
+            if batch_task == 'sst-2' or batch_task == 'mnli':
                 inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
                 inputs["token_type_ids"] = batch[2]
 
