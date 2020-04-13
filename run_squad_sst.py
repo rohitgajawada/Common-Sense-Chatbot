@@ -226,7 +226,7 @@ def train(args, concat_train_dataset, model, tokenizer):
                 # Log metrics
                 if args.logging_steps > 0 and global_step % args.logging_steps == 0:
                     # Only evaluate when single GPU otherwise metrics may not average well
-                    if args.evaluate_during_training:
+                    if args.evaluate_during_training and global_step % args.eval_logging_steps == 0:
                         results_QA = QA_evaluate(args, model, tokenizer)
                         for key, value in results_QA.items():
                             tb_writer.add_scalar("QA_eval_{}".format(key), value, global_step)
@@ -243,6 +243,9 @@ def train(args, concat_train_dataset, model, tokenizer):
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
                     tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
                     logging_loss = tr_loss
+                    
+                    logger.info("Results_QA: {}".format(results_QA))
+                    logger.info("Results_SST: {}".format(results_SST))
 
                 # Save model checkpoint
                 if args.save_steps > 0 and global_step % args.save_steps == 0:
@@ -715,6 +718,8 @@ def main():
     )
 
     parser.add_argument("--logging_steps", type=int, default=500, help="Log every X updates steps.")
+    parser.add_argument("--eval_logging_steps", type=int, default=500, help="Log eval every X updates steps.")
+    
     parser.add_argument("--save_steps", type=int, default=500, help="Save checkpoint every X updates steps.")
     parser.add_argument(
         "--eval_all_checkpoints",
