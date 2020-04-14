@@ -26,9 +26,12 @@ import timeit
 
 import numpy as np
 import torch
+from torch.utils.data.dataset import ConcatDataset
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, TensorDataset
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
+from mlt_batch_scheduler import BalancedBatchSchedulerSampler
+from multi_task_batch_scheduler import BatchSchedulerSampler
 
 from transformers import (
     MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING,
@@ -85,8 +88,9 @@ def train(args, concat_train_dataset, model, tokenizer):
     tb_writer = SummaryWriter()
 
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
-    train_sampler = RandomSampler(train_dataset)
-    train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
+    #train_sampler = RandomSampler(train_dataset)
+    #train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
+    train_dataloader = DataLoader(concat_train_dataset, sampler=BatchSchedulerSampler(concat_train_dataset, batch_size=args.train_batch_size), batch_size=args.train_batch_size, shuffle=False)
 
     if args.max_steps > 0:
         t_total = args.max_steps
@@ -122,7 +126,7 @@ def train(args, concat_train_dataset, model, tokenizer):
 
     # Train!
     logger.info("***** Running training *****")
-    logger.info("  Num examples = %d", len(train_dataset))
+    # logger.info("  Num examples = %d", len(train_dataset))
     logger.info("  Num Epochs = %d", args.num_train_epochs)
     logger.info("  Instantaneous batch size per GPU = %d", args.per_gpu_train_batch_size)
     logger.info(
@@ -164,7 +168,10 @@ def train(args, concat_train_dataset, model, tokenizer):
     for _ in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")
         for step, batch in enumerate(epoch_iterator):
-
+            if step%2==0:
+              batch_task = 'qa'
+            else:
+              batch_task = 'sst-2'
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
@@ -174,18 +181,23 @@ def train(args, concat_train_dataset, model, tokenizer):
             batch = tuple(t.to(args.device) for t in batch)
 
             # import pdb; pdb.set_trace()
-
-            #TODO: depending on the task change the input format because the batch would be for that task
-
-            inputs = {
-                "input_ids": batch[0],
-                "attention_mask": batch[1],
-                "token_type_ids": batch[2],
-                "start_positions": batch[3],
-                "end_positions": batch[4],
-            }
             
-            #TODO
+            if step < 100:
+                logger.info(batch_task)
+            
+            if batch_task == 'qa':
+                inputs = {
+                    "input_ids": batch[0],
+                    "attention_mask": batch[1],
+                    "token_type_ids": batch[2],
+                    "start_positions": batch[3],
+                    "end_positions": batch[4],
+                }
+            
+            if batch_task == 'sst-2' or batch_task == 'mnli':
+                inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
+                inputs["token_type_ids"] = batch[2]
+
             inputs["task"] = batch_task
 
             outputs = model(**inputs)
@@ -211,7 +223,7 @@ def train(args, concat_train_dataset, model, tokenizer):
                 # Log metrics
                 if args.logging_steps > 0 and global_step % args.logging_steps == 0:
                     # Only evaluate when single GPU otherwise metrics may not average well
-                    if args.evaluate_during_training:
+                    if args.evaluate_during_training and global_step % args.eval_logging_steps == 0:
                         results_QA = QA_evaluate(args, model, tokenizer)
                         for key, value in results_QA.items():
                             tb_writer.add_scalar("QA_eval_{}".format(key), value, global_step)
@@ -224,6 +236,12 @@ def train(args, concat_train_dataset, model, tokenizer):
                             results_MNLI = GLUE_evaluate(args, model, tokenizer, task_name='mnli')
                             for key, value in results_MNLI.items():
                                 tb_writer.add_scalar("MNLI_eval_{}".format(key), value, global_step)  
+                                
+                        logger.info("Results_QA: {}".format(results_QA))
+                        logger.info("Results_SST: {}".format(results_SST))
+                    
+                        if args.do_mnli:
+                            logger.info("Results_MNLI: {}".format(results_MNLI))
                             
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
                     tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
@@ -272,7 +290,8 @@ def GLUE_evaluate(args, model, tokenizer, task_name, prefix=""):
         args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
         # Note that DistributedSampler samples randomly
         eval_sampler = SequentialSampler(eval_dataset)
-        eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+        #eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+        eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size, shuffle=False)
 
         # multi-gpu eval
         if args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
@@ -333,7 +352,8 @@ def QA_evaluate(args, model, tokenizer, prefix=""):
 
     # Note that DistributedSampler samples randomly
     eval_sampler = SequentialSampler(dataset)
-    eval_dataloader = DataLoader(dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+    #eval_dataloader = DataLoader(dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+    eval_dataloader = DataLoader(dataset, sampler=eval_sampler, batch_size=args.eval_batch_size, shuffle=False)
 
     # multi-gpu evaluate
     if args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
@@ -377,11 +397,11 @@ def QA_evaluate(args, model, tokenizer, prefix=""):
     logger.info("  Evaluation done in total %f secs (%f sec per example)", evalTime, evalTime / len(dataset))
 
     # Compute predictions
-    output_prediction_file = os.path.join(args.output_dir, "predictions_{}.json".format(prefix))
-    output_nbest_file = os.path.join(args.output_dir, "nbest_predictions_{}.json".format(prefix))
+    output_prediction_file = os.path.join(args.output_dir, "squad_predictions_{}.json".format(prefix))
+    output_nbest_file = os.path.join(args.output_dir, "nbest_squad_predictions_{}.json".format(prefix))
 
     if args.version_2_with_negative:
-        output_null_log_odds_file = os.path.join(args.output_dir, "null_odds_{}.json".format(prefix))
+        output_null_log_odds_file = os.path.join(args.output_dir, "squad_null_odds_{}.json".format(prefix))
     else:
         output_null_log_odds_file = None
     
@@ -698,7 +718,9 @@ def main():
     )
 
     parser.add_argument("--logging_steps", type=int, default=500, help="Log every X updates steps.")
-    parser.add_argument("--save_steps", type=int, default=500, help="Save checkpoint every X updates steps.")
+    parser.add_argument("--eval_logging_steps", type=int, default=2000, help="Log eval every X updates steps.")
+    
+    parser.add_argument("--save_steps", type=int, default=2000, help="Save checkpoint every X updates steps.")
     parser.add_argument(
         "--eval_all_checkpoints",
         action="store_true",
@@ -784,9 +806,9 @@ def main():
             MNLI_train_dataset = GLUE_load_and_cache_examples(args, 'mnli', tokenizer, evaluate=False)
         
         if args.do_mnli:
-            concat_datasets = [squad_train_dataset, SST_train_dataset, MNLI_train_dataset]
+            concat_datasets = ConcatDataset([squad_train_dataset, SST_train_dataset, MNLI_train_dataset])
         else:
-            concat_datasets = [squad_train_dataset, SST_train_dataset]
+            concat_datasets = ConcatDataset([squad_train_dataset, SST_train_dataset])
         
         #Sending concat datasets for different tasks
         global_step, tr_loss = train(args, concat_datasets, model, tokenizer)

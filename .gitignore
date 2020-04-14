@@ -11,3 +11,5 @@ runs/
 temp.py
 comet/pretrained_models/
 comet/data/
+mt_data/
+
