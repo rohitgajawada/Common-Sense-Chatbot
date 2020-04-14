@@ -190,7 +190,7 @@ def train(args, train_dataset, model, tokenizer):
                 "start_positions": batch[3],
                 "end_positions": batch[4],
             }
-
+            print(inputs)
             if args.model_type in ["xlm", "roberta", "distilbert", "camembert"]:
                 del inputs["token_type_ids"]
 
@@ -305,7 +305,7 @@ def evaluate(args, model, tokenizer, prefix=""):
                 "attention_mask": batch[1],
                 "token_type_ids": batch[2],
             }
-
+            
             if args.model_type in ["xlm", "roberta", "distilbert", "camembert"]:
                 del inputs["token_type_ids"]
 
@@ -451,7 +451,7 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
                 examples = processor.get_dev_examples(args.data_dir, filename=args.predict_file)
             else:
                 examples = processor.get_train_examples(args.data_dir, filename=args.train_file)
-
+        print(examples.data)
         features, dataset = squad_convert_examples_to_features(
             examples=examples,
             tokenizer=tokenizer,
