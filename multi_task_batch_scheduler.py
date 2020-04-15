@@ -38,6 +38,10 @@ class BatchSchedulerSampler(torch.utils.data.sampler.Sampler):
             for i in range(self.number_of_datasets):
                 cur_batch_sampler = sampler_iterators[i]
                 cur_samples = []
+                if i == 0:
+                    samples_to_grab *= 2
+                else:
+                    samples_to_grab = self.batch_size
                 for _ in range(samples_to_grab):
                     try:
                         cur_sample_org = cur_batch_sampler.__next__()
@@ -56,6 +60,7 @@ class BatchSchedulerSampler(torch.utils.data.sampler.Sampler):
                             cur_sample_org = cur_batch_sampler.__next__()
                             cur_sample = cur_sample_org + push_index_val[i]
                             cur_samples.append(cur_sample)
+                
                 final_samples_list.extend(cur_samples)
-
+        
         return iter(final_samples_list)
