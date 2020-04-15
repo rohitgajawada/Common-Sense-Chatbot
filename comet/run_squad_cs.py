@@ -52,6 +52,22 @@ try:
 except ImportError:
     from tensorboardX import SummaryWriter
 
+## Comet Imports
+import os
+import sys
+import argparse
+import torch
+
+import spacy
+
+sys.path.append(os.getcwd())
+
+import src.data.data as data
+import src.data.config as cfg
+import src.interactive.functions as interactive
+
+import tensorflow as tf
+##
 
 logger = logging.getLogger(__name__)
 
@@ -407,6 +423,61 @@ def evaluate(args, model, tokenizer, prefix=""):
 
 
 def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=False):
+    # COMET model setting up
+    device = "cpu"
+    comet_model = "pretrained_models/atomic_pretrained_model.pickle"
+    sampling_algo = "beam-2"
+    opt, state_dict = interactive.load_model_file(comet_model)
+
+    data_loader, text_encoder = interactive.load_data("atomic", opt)
+
+    n_ctx = data_loader.max_event + data_loader.max_effect
+    n_vocab = len(text_encoder.encoder) + n_ctx
+    model = interactive.make_model(opt, n_vocab, n_ctx, state_dict)
+    nlp = spacy.load("en_core_web_sm")
+
+    if device != "cpu":
+        cfg.device = int(device)
+        cfg.do_gpu = True
+        torch.cuda.set_device(cfg.device)
+        model.cuda(cfg.device)
+    else:
+        cfg.device = "cpu"
+    
+    sampling_algorithm = sampling_algo
+
+    sampler = interactive.set_sampler(opt, sampling_algorithm, data_loader)
+
+    def augment(article):
+        context = (article.numpy().decode('UTF-8'))
+        category = "oEffect"
+        entity_list = nlp(context)
+        input_event = context
+        replacement_list = ["PersonX", "PersonY", "PersonZ"]
+        r = 0
+        for entity in entity_list.ents:
+            if entity.label_ == 'PERSON' or entity.label_ == 'NORP':
+                input_event = input_event.replace(entity.text, replacement_list[r])
+                r += 1
+                if(r == 3):
+                    break
+
+        outputs = interactive.get_atomic_sequence(
+            input_event, model, sampler, data_loader, text_encoder, category)
+
+        for key in outputs:
+            article = context + ((outputs[key]["beams"][0]))
+        return article
+
+    def process_example(example):
+
+        example['context'] = tf.py_function(func=augment,
+                                        inp=[example['context']],
+                                        Tout=tf.string)
+        return example
+
+    ## End
+
     if args.local_rank not in [-1, 0] and not evaluate:
         # Make sure only the first process in distributed training process the dataset, and the others will use the cache
         torch.distributed.barrier()
@@ -444,6 +515,7 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
                 logger.warn("tensorflow_datasets does not handle version 2 of SQuAD.")
 
             tfds_examples = tfds.load("squad")
+            tfds_examples["train"] = tfds_examples["train"].map(lambda x: process_example(x))
             examples = SquadV1Processor().get_examples_from_dataset(tfds_examples, evaluate=evaluate)
         else:
             processor = SquadV2Processor() if args.version_2_with_negative else SquadV1Processor()
@@ -451,7 +523,9 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
                 examples = processor.get_dev_examples(args.data_dir, filename=args.predict_file)
             else:
                 examples = processor.get_train_examples(args.data_dir, filename=args.train_file)
-        print(examples.data)
+        
+
+        
         features, dataset = squad_convert_examples_to_features(
             examples=examples,
             tokenizer=tokenizer,
@@ -750,7 +824,6 @@ def main():
         torch.distributed.barrier()
 
     model.to(args.device)
-
     logger.info("Training/evaluation parameters %s", args)
 
     # Before we do anything with models, we want to ensure that we get fp16 execution of torch.einsum if args.fp16 is set.

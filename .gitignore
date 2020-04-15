@@ -9,5 +9,9 @@ SST-2.zip
 cached_train_bert-base-uncased_384
 runs/
 temp.py
+comet/pretrained_models/
+comet/data/
+comet/model/
+comet/results/
 mt_data/
 
