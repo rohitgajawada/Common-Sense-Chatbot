@@ -80,7 +80,7 @@ def to_list(tensor):
     return tensor.detach().cpu().tolist()
 
 
-def train(args, concat_train_dataset, model, tokenizer):
+def train(args, concat_train_dataset, model, tokenizer, number_of_tasks):
     """ Train the model """
     
     #TODO: SPLIT DATASET AND DO THE CONCAT MULTI TASK BATCHING
@@ -165,13 +165,16 @@ def train(args, concat_train_dataset, model, tokenizer):
     set_seed(args)
 
     #TODO BATCHER
+    
     for _ in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")
         for step, batch in enumerate(epoch_iterator):
-            if step%2==0:
-              batch_task = 'qa'
+            if step%number_of_tasks==0:
+                batch_task = 'qa'
+            elif step%(number_of_tasks-1)==0:
+                batch_task = 'sst-2'
             else:
-              batch_task = 'sst-2'
+                batch_task = 'mnli'
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
@@ -807,11 +810,13 @@ def main():
         
         if args.do_mnli:
             concat_datasets = ConcatDataset([squad_train_dataset, SST_train_dataset, MNLI_train_dataset])
+            number_of_tasks = 3
         else:
             concat_datasets = ConcatDataset([squad_train_dataset, SST_train_dataset])
+            number_of_tasks = 2
         
         #Sending concat datasets for different tasks
-        global_step, tr_loss = train(args, concat_datasets, model, tokenizer)
+        global_step, tr_loss = train(args, concat_datasets, model, tokenizer, number_of_tasks)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
     # Save the trained model and the tokenizer
