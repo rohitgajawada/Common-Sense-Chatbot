@@ -222,83 +222,83 @@ def train(args, train_dataset, model, tokenizer):
 
 
 def evaluate(args, model, tokenizer, prefix="", test=False):
-    eval_task_names = (args.task_name,)
-    eval_outputs_dirs = (args.output_dir,)
+    # eval_task_names = (args.task_name,)
+    eval_output_dir = (args.output_dir,)
 
     results = {}
-    for eval_task, eval_output_dir in zip(eval_task_names, eval_outputs_dirs):
-        eval_dataset = load_and_cache_examples(args, eval_task, tokenizer, evaluate=not test, test=test)
+    # for eval_task, eval_output_dir in zip(eval_task_names, eval_outputs_dirs):
+    eval_dataset = load_and_cache_examples(args, tokenizer, evaluate=not test, test=test)
 
-        if not os.path.exists(eval_output_dir) and args.local_rank in [-1, 0]:
-            os.makedirs(eval_output_dir)
+    if not os.path.exists(eval_output_dir) and args.local_rank in [-1, 0]:
+        os.makedirs(eval_output_dir)
 
-        args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
-        # Note that DistributedSampler samples randomly
-        eval_sampler = SequentialSampler(eval_dataset)
-        eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+    args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
+    # Note that DistributedSampler samples randomly
+    eval_sampler = SequentialSampler(eval_dataset)
+    eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
 
-        # multi-gpu evaluate
-        if args.n_gpu > 1:
-            model = torch.nn.DataParallel(model)
+    # multi-gpu evaluate
+    if args.n_gpu > 1:
+        model = torch.nn.DataParallel(model)
 
-        # Eval!
-        logger.info("***** Running evaluation {} *****".format(prefix))
-        logger.info("  Num examples = %d", len(eval_dataset))
-        logger.info("  Batch size = %d", args.eval_batch_size)
-        eval_loss = 0.0
-        nb_eval_steps = 0
-        preds = None
-        out_label_ids = None
-        for batch in tqdm(eval_dataloader, desc="Evaluating"):
-            model.eval()
-            batch = tuple(t.to(args.device) for t in batch)
+    # Eval!
+    logger.info("***** Running evaluation {} *****".format(prefix))
+    logger.info("  Num examples = %d", len(eval_dataset))
+    logger.info("  Batch size = %d", args.eval_batch_size)
+    eval_loss = 0.0
+    nb_eval_steps = 0
+    preds = None
+    out_label_ids = None
+    for batch in tqdm(eval_dataloader, desc="Evaluating"):
+        model.eval()
+        batch = tuple(t.to(args.device) for t in batch)
 
-            with torch.no_grad():
-                inputs = {
-                    "input_ids": batch[0],
-                    "attention_mask": batch[1],
-                    "token_type_ids": batch[2]
-                    if args.model_type in ["bert", "xlnet"]
-                    else None,  # XLM don't use segment_ids
-                    "labels": batch[3],
-                }
-                outputs = model(**inputs)
-                tmp_eval_loss, logits = outputs[:2]
+        with torch.no_grad():
+            inputs = {
+                "input_ids": batch[0],
+                "attention_mask": batch[1],
+                "token_type_ids": batch[2]
+                if args.model_type in ["bert", "xlnet"]
+                else None,  # XLM don't use segment_ids
+                "labels": batch[3],
+            }
+            outputs = model(**inputs)
+            tmp_eval_loss, logits = outputs[:2]
 
-                eval_loss += tmp_eval_loss.mean().item()
-            nb_eval_steps += 1
-            if preds is None:
-                preds = logits.detach().cpu().numpy()
-                out_label_ids = inputs["labels"].detach().cpu().numpy()
-            else:
-                preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
-                out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
+            eval_loss += tmp_eval_loss.mean().item()
+        nb_eval_steps += 1
+        if preds is None:
+            preds = logits.detach().cpu().numpy()
+            out_label_ids = inputs["labels"].detach().cpu().numpy()
+        else:
+            preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
+            out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
 
-        eval_loss = eval_loss / nb_eval_steps
-        preds = np.argmax(preds, axis=1)
-        acc = simple_accuracy(preds, out_label_ids)
-        result = {"eval_acc": acc, "eval_loss": eval_loss}
-        results.update(result)
+    eval_loss = eval_loss / nb_eval_steps
+    preds = np.argmax(preds, axis=1)
+    acc = simple_accuracy(preds, out_label_ids)
+    result = {"eval_acc": acc, "eval_loss": eval_loss}
+    results.update(result)
 
-        output_eval_file = os.path.join(eval_output_dir, "is_test_" + str(test).lower() + "_eval_results.txt")
+    output_eval_file = os.path.join(eval_output_dir, "is_test_" + str(test).lower() + "_eval_results.txt")
 
-        with open(output_eval_file, "w") as writer:
-            logger.info("***** Eval results {} *****".format(str(prefix) + " is test:" + str(test)))
-            writer.write("model           =%s\n" % str(args.model_name_or_path))
-            writer.write(
-                "total batch size=%d\n"
-                % (
-                    args.per_gpu_train_batch_size
-                    * args.gradient_accumulation_steps
-                    * (torch.distributed.get_world_size() if args.local_rank != -1 else 1)
-                )
+    with open(output_eval_file, "w") as writer:
+        logger.info("***** Eval results {} *****".format(str(prefix) + " is test:" + str(test)))
+        writer.write("model           =%s\n" % str(args.model_name_or_path))
+        writer.write(
+            "total batch size=%d\n"
+            % (
+                args.per_gpu_train_batch_size
+                * args.gradient_accumulation_steps
+                * (torch.distributed.get_world_size() if args.local_rank != -1 else 1)
             )
-            writer.write("train num epochs=%d\n" % args.num_train_epochs)
-            writer.write("fp16            =%s\n" % args.fp16)
-            writer.write("max seq length  =%d\n" % args.max_seq_length)
-            for key in sorted(result.keys()):
-                logger.info("  %s = %s", key, str(result[key]))
-                writer.write("%s = %s\n" % (key, str(result[key])))
+        )
+        writer.write("train num epochs=%d\n" % args.num_train_epochs)
+        writer.write("fp16            =%s\n" % args.fp16)
+        writer.write("max seq length  =%d\n" % args.max_seq_length)
+        for key in sorted(result.keys()):
+            logger.info("  %s = %s", key, str(result[key]))
+            writer.write("%s = %s\n" % (key, str(result[key])))
     return results
 
 
