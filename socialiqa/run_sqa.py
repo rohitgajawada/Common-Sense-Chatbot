@@ -223,7 +223,7 @@ def train(args, train_dataset, model, tokenizer):
 
 def evaluate(args, model, tokenizer, prefix="", test=False):
     # eval_task_names = (args.task_name,)
-    eval_output_dir = (args.output_dir,)
+    eval_output_dir = args.output_dir
 
     results = {}
     # for eval_task, eval_output_dir in zip(eval_task_names, eval_outputs_dirs):

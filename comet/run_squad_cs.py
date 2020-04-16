@@ -450,7 +450,7 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
 
     def augment(article):
         context = (article.numpy().decode('UTF-8'))
-        category = "oEffect"
+        category = "all"
         entity_list = nlp(context)
         input_event = context
         replacement_list = ["PersonX", "PersonY", "PersonZ"]

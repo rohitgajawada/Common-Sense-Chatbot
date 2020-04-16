@@ -17,3 +17,4 @@ mt_data/
 */.DS_STORE
 */__pycache__
 socialiqa/socialiqa-train-dev/
+pretrained_models.tar.gz

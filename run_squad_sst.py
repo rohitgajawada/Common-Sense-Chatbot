@@ -169,12 +169,14 @@ def train(args, concat_train_dataset, model, tokenizer, number_of_tasks):
     for _ in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration")
         for step, batch in enumerate(epoch_iterator):
-            if step%number_of_tasks==0:
+            
+            if (step % (number_of_tasks + 1)) == 0 or (step % (number_of_tasks + 1)) == 1:
                 batch_task = 'qa'
-            elif step%(number_of_tasks-1)==0:
+            elif (step % (number_of_tasks + 1)) == 2:
                 batch_task = 'sst-2'
             else:
                 batch_task = 'mnli'
+                
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
