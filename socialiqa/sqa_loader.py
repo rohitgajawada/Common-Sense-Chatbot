@@ -135,7 +135,7 @@ class SQAProcessor(DataProcessor):
 
     def get_labels(self):
         """See base class."""
-        return ["1", "2", "3"]
+        return ["0", "1", "2"]
         
 
     def _read_json(self, input_file, label_file):
@@ -162,7 +162,7 @@ class SQAProcessor(DataProcessor):
                     choice_1 = lines[i]["answerA"],
                     choice_2 = lines[i]["answerB"],
                     choice_3 = lines[i]["answerC"],
-                    label = labels[i] if is_training else None
+                    label = str(int(labels[i])-1) if is_training else None
                 ) 
             ]
         return examples
@@ -183,7 +183,7 @@ def convert_examples_to_features(
     Loads a data file into a list of `InputFeatures`
     """
 
-    label_map = {label: i+1 for i, label in enumerate(label_list)}
+    label_map = {label: i for i, label in enumerate(label_list)}
 
     features = []
     for (ex_index, example) in tqdm.tqdm(enumerate(examples), desc="convert examples to features"):

@@ -16,3 +16,4 @@ comet/results/
 mt_data/
 */.DS_STORE
 */__pycache__
+socialiqa/socialiqa-train-dev/
