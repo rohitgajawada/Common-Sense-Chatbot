@@ -145,7 +145,7 @@ def print_atomic_sequence(sequence_object):
 
 
 def set_atomic_inputs(input_event, category, data_loader, text_encoder):
-    data_loader.max_event = 32
+    data_loader.max_event = 45
     XMB = torch.zeros(1, data_loader.max_event + 1).long().to(cfg.device)
     prefix, suffix = data.atomic_data.do_example(text_encoder, input_event, None, True, None)
 

@@ -251,7 +251,7 @@ class SQAProcessor(DataProcessor):
         # print(lines[5]["context"])
         # print("jere")
         # aug_context = augment(lines[5]["context"])
-        for i in range(1,len(lines)):
+        for i in range(len(lines)):
             # print(lines[i]["context"])
             aug_context = augment(lines[i]["context"])
             examples += [
