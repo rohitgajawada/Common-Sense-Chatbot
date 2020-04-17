@@ -162,7 +162,7 @@ class SQAProcessor(DataProcessor):
                     choice_1 = lines[i]["answerA"],
                     choice_2 = lines[i]["answerB"],
                     choice_3 = lines[i]["answerC"],
-                    label = str(int(labels[i])-1) if is_training else None
+                    label = str(int(labels[i])-1) 
                 ) 
             ]
         return examples

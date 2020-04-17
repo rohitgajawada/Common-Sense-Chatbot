@@ -206,7 +206,6 @@ def train(args, train_dataset, model, tokenizer):
                 "start_positions": batch[3],
                 "end_positions": batch[4],
             }
-            print(inputs)
             if args.model_type in ["xlm", "roberta", "distilbert", "camembert"]:
                 del inputs["token_type_ids"]
 
@@ -456,7 +455,7 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
         replacement_list = ["PersonX", "PersonY", "PersonZ"]
         r = 0
         for entity in entity_list.ents:
-            if entity.label_ == 'PERSON' or entity.label_ == 'NORP':
+            if entity.label_ == 'PERSON':
                 input_event = input_event.replace(entity.text, replacement_list[r])
                 r += 1
                 if(r == 3):
