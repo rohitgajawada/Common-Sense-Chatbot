@@ -573,6 +573,9 @@ def main():
     logger.info("Training/evaluation parameters %s", args)
     best_steps = 0
 
+    #for param_tensor in model.state_dict():
+        #print(param_tensor, "\t", model.state_dict()[param_tensor].size())
+    
     # Training
     if args.do_train:
         train_dataset = load_and_cache_examples(args,  tokenizer, evaluate=False)
