@@ -86,7 +86,8 @@ def train(args, train_dataset, model, tokenizer):
         },
         {"params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], "weight_decay": 0.0},
     ]
-    optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate, eps=args.adam_epsilon)
+    # optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate, eps=args.adam_epsilon)
+    optimizer = AdamW(model.pooler.named_parameters(), lr=args.learning_rate, eps=args.adam_epsilon)
     scheduler = get_linear_schedule_with_warmup(
         optimizer, num_warmup_steps=args.warmup_steps, num_training_steps=t_total
     )
@@ -165,11 +166,9 @@ def train(args, train_dataset, model, tokenizer):
                 model.zero_grad()
                 global_step += 1
 
-                if args.local_rank in [-1, 0] and args.logging_steps > 0 and global_step % args.logging_steps == 0:
+                if args.logging_steps > 0 and global_step % args.logging_steps == 0:
                     # Log metrics
-                    if (
-                        args.local_rank == -1 and args.evaluate_during_training
-                    ):  # Only evaluate when single GPU otherwise metrics may not average well
+                    if (args.evaluate_during_training):
                         results = evaluate(args, model, tokenizer)
                         for key, value in results.items():
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
@@ -186,6 +185,14 @@ def train(args, train_dataset, model, tokenizer):
                                     str(results_test["eval_loss"]),
                                     str(global_step),
                                 )
+
+                        file0 = open("train_eval_logs.txt", "a") 
+                        file0.write(str(results["eval_acc"]) + ','\
+                        + str(results["eval_loss"]) + "," + \
+                        str(global_step) + "\n") 
+                        file0.close()
+
+
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
                     tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
                     logger.info(
@@ -193,6 +200,13 @@ def train(args, train_dataset, model, tokenizer):
                         str((tr_loss - logging_loss) / args.logging_steps),
                         str(global_step),
                     )
+                    
+
+                    file1 = open("train_loss_logs.txt", "a")  # append mode 
+                    file1.write(str((tr_loss - logging_loss) / args.logging_steps) + "," + \
+                    str(global_step) + "\n") 
+                    file1.close() 
+
                     logging_loss = tr_loss
 
                 if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
@@ -565,6 +579,19 @@ def main():
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
 
+    import torch.nn as nn
+
+    x = nn.Linear(768, 768)
+    y = nn.Linear(768, 768)
+    z = nn.Linear(768, 768)
+    tanh = nn.Tanh()
+
+    new_pooler = nn.Sequential(x, tanh, y, tanh, z, tanh)
+
+    model.pooler = new_pooler
+    print(model)
+
+
     if args.local_rank == 0:
         torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
 
@@ -573,9 +600,6 @@ def main():
     logger.info("Training/evaluation parameters %s", args)
     best_steps = 0
 
-    #for param_tensor in model.state_dict():
-        #print(param_tensor, "\t", model.state_dict()[param_tensor].size())
-    
     # Training
     if args.do_train:
         train_dataset = load_and_cache_examples(args,  tokenizer, evaluate=False)

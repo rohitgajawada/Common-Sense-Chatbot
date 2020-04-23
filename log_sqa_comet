@@ -1,0 +1,1554 @@
+2020-04-19 23:40:50.043657: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+04/19/2020 23:40:52 - WARNING - __main__ -   Process rank: -1, device: cuda, n_gpu: 1, distributed training: False, 16-bits training: False
+04/19/2020 23:40:52 - INFO - transformers.configuration_utils -   loading configuration file https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased-config.json from cache at /root/.cache/torch/transformers/4dad0251492946e18ac39290fcfe91b89d370fee250efe9521476438fe8ca185.8f56353af4a709bf5ff0fbc915d8f5b42bfff892cbb6ac98c3c45f481a03c685
+04/19/2020 23:40:52 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMaskedLM"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:40:53 - INFO - transformers.tokenization_utils -   loading file https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased-vocab.txt from cache at /root/.cache/torch/transformers/26bc1ad6c0ac742e9b52263248f6d0f00068293b33709fae12320c0e35ccfbbb.542ce4285a40d23a559526243235df47c5f75c197f04f37d1a0c124c32c9a084
+04/19/2020 23:40:54 - INFO - transformers.modeling_utils -   loading weights file https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased-pytorch_model.bin from cache at /root/.cache/torch/transformers/aa1ef1aede4482d0dbcd4d52baad8ae300e60902e88fcb0bebdec09afd232066.36ca03ab34a1a5d5fa7bc3d03d55c4fa650fed07220e2eeebc06ce58d0e9a157
+04/19/2020 23:40:57 - INFO - transformers.modeling_utils -   Weights of BertForMultipleChoice not initialized from pretrained model: ['classifier.weight', 'classifier.bias']
+04/19/2020 23:40:57 - INFO - transformers.modeling_utils -   Weights from pretrained model not used in BertForMultipleChoice: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
+04/19/2020 23:41:00 - INFO - __main__ -   Training/evaluation parameters Namespace(adam_epsilon=1e-08, cache_dir='', config_name='', data_dir='socialiqa-train-dev', device=device(type='cuda'), do_eval=True, do_lower_case=False, do_test=False, do_train=False, eval_all_checkpoints=True, evaluate_during_training=False, fp16=False, fp16_opt_level='O1', gradient_accumulation_steps=1, learning_rate=5e-05, local_rank=-1, logging_steps=500, max_grad_norm=1.0, max_seq_length=128, max_steps=-1, model_name_or_path='bert-base-uncased', model_type='bert', n_gpu=1, no_cuda=False, num_train_epochs=3.0, output_dir='output_sqa_sanitycheck_2/', overwrite_cache=False, overwrite_output_dir=False, per_gpu_eval_batch_size=8, per_gpu_train_batch_size=8, save_steps=500, seed=42, server_ip='', server_port='', tokenizer_name='', warmup_steps=0, weight_decay=0.0)
+output_sqa_sanitycheck_2/
+['output_sqa_sanitycheck_2/', 'output_sqa_sanitycheck_2/checkpoint-500/', 'output_sqa_sanitycheck_2/checkpoint-1000/', 'output_sqa_sanitycheck_2/checkpoint-1500/', 'output_sqa_sanitycheck_2/checkpoint-2000/', 'output_sqa_sanitycheck_2/checkpoint-2500/', 'output_sqa_sanitycheck_2/checkpoint-3000/', 'output_sqa_sanitycheck_2/checkpoint-3500/', 'output_sqa_sanitycheck_2/checkpoint-4000/', 'output_sqa_sanitycheck_2/checkpoint-4500/', 'output_sqa_sanitycheck_2/checkpoint-5000/', 'output_sqa_sanitycheck_2/checkpoint-5500/', 'output_sqa_sanitycheck_2/checkpoint-6000/', 'output_sqa_sanitycheck_2/checkpoint-6500/', 'output_sqa_sanitycheck_2/checkpoint-7000/', 'output_sqa_sanitycheck_2/checkpoint-7500/', 'output_sqa_sanitycheck_2/checkpoint-8000/', 'output_sqa_sanitycheck_2/checkpoint-8500/', 'output_sqa_sanitycheck_2/checkpoint-9000/', 'output_sqa_sanitycheck_2/checkpoint-9500/', 'output_sqa_sanitycheck_2/checkpoint-10000/', 'output_sqa_sanitycheck_2/checkpoint-10500/', 'output_sqa_sanitycheck_2/checkpoint-11000/', 'output_sqa_sanitycheck_2/checkpoint-11500/', 'output_sqa_sanitycheck_2/checkpoint-12000/', 'output_sqa_sanitycheck_2/checkpoint-12500/']
+04/19/2020 23:41:00 - INFO - __main__ -   Evaluate the following checkpoints: ['output_sqa_sanitycheck_2/checkpoint-1000', 'output_sqa_sanitycheck_2/checkpoint-10000', 'output_sqa_sanitycheck_2/checkpoint-10500', 'output_sqa_sanitycheck_2/checkpoint-11000', 'output_sqa_sanitycheck_2/checkpoint-11500', 'output_sqa_sanitycheck_2/checkpoint-12000', 'output_sqa_sanitycheck_2/checkpoint-12500', 'output_sqa_sanitycheck_2/checkpoint-1500', 'output_sqa_sanitycheck_2/checkpoint-2000', 'output_sqa_sanitycheck_2/checkpoint-2500', 'output_sqa_sanitycheck_2/checkpoint-3000', 'output_sqa_sanitycheck_2/checkpoint-3500', 'output_sqa_sanitycheck_2/checkpoint-4000', 'output_sqa_sanitycheck_2/checkpoint-4500', 'output_sqa_sanitycheck_2/checkpoint-500', 'output_sqa_sanitycheck_2/checkpoint-5000', 'output_sqa_sanitycheck_2/checkpoint-5500', 'output_sqa_sanitycheck_2/checkpoint-6000', 'output_sqa_sanitycheck_2/checkpoint-6500', 'output_sqa_sanitycheck_2/checkpoint-7000', 'output_sqa_sanitycheck_2/checkpoint-7500', 'output_sqa_sanitycheck_2/checkpoint-8000', 'output_sqa_sanitycheck_2/checkpoint-8500', 'output_sqa_sanitycheck_2/checkpoint-9000', 'output_sqa_sanitycheck_2/checkpoint-9500', 'output_sqa_sanitycheck_2']
+04/19/2020 23:41:01 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-1000/config.json
+04/19/2020 23:41:01 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:41:05 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:41:05 - INFO - __main__ -   ***** Running evaluation checkpoint-1000 *****
+04/19/2020 23:41:05 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:41:05 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.61it/s]
+04/19/2020 23:41:28 - INFO - __main__ -   ***** Eval results checkpoint-1000 is test:False *****
+04/19/2020 23:41:28 - INFO - __main__ -     eval_acc = 0.45878136200716846
+04/19/2020 23:41:28 - INFO - __main__ -     eval_loss = 1.0508512414231592
+04/19/2020 23:41:28 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-10000/config.json
+04/19/2020 23:41:28 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:41:31 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:41:32 - INFO - __main__ -   ***** Running evaluation checkpoint-10000 *****
+04/19/2020 23:41:32 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:41:32 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.60it/s]
+04/19/2020 23:41:55 - INFO - __main__ -   ***** Eval results checkpoint-10000 is test:False *****
+04/19/2020 23:41:55 - INFO - __main__ -     eval_acc = 0.4930875576036866
+04/19/2020 23:41:55 - INFO - __main__ -     eval_loss = 1.4599977883757378
+04/19/2020 23:41:55 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-10500/config.json
+04/19/2020 23:41:55 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:41:57 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:41:58 - INFO - __main__ -   ***** Running evaluation checkpoint-10500 *****
+04/19/2020 23:41:58 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:41:58 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:42:21 - INFO - __main__ -   ***** Eval results checkpoint-10500 is test:False *****
+04/19/2020 23:42:21 - INFO - __main__ -     eval_acc = 0.4915514592933948
+04/19/2020 23:42:21 - INFO - __main__ -     eval_loss = 1.340388864887004
+04/19/2020 23:42:21 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-11000/config.json
+04/19/2020 23:42:21 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:42:23 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:42:24 - INFO - __main__ -   ***** Running evaluation checkpoint-11000 *****
+04/19/2020 23:42:24 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:42:24 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.53it/s]
+04/19/2020 23:42:47 - INFO - __main__ -   ***** Eval results checkpoint-11000 is test:False *****
+04/19/2020 23:42:47 - INFO - __main__ -     eval_acc = 0.4987199180747568
+04/19/2020 23:42:47 - INFO - __main__ -     eval_loss = 1.3687697838763802
+04/19/2020 23:42:47 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-11500/config.json
+04/19/2020 23:42:47 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:42:50 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:42:50 - INFO - __main__ -   ***** Running evaluation checkpoint-11500 *****
+04/19/2020 23:42:50 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:42:50 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.65it/s]
+04/19/2020 23:43:13 - INFO - __main__ -   ***** Eval results checkpoint-11500 is test:False *****
+04/19/2020 23:43:13 - INFO - __main__ -     eval_acc = 0.5028161802355351
+04/19/2020 23:43:13 - INFO - __main__ -     eval_loss = 1.4407035316739762
+04/19/2020 23:43:13 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-12000/config.json
+04/19/2020 23:43:13 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:43:16 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:43:16 - INFO - __main__ -   ***** Running evaluation checkpoint-12000 *****
+04/19/2020 23:43:16 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:43:16 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:43:39 - INFO - __main__ -   ***** Eval results checkpoint-12000 is test:False *****
+04/19/2020 23:43:39 - INFO - __main__ -     eval_acc = 0.49615975422427033
+04/19/2020 23:43:39 - INFO - __main__ -     eval_loss = 1.4119563612402701
+04/19/2020 23:43:39 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-12500/config.json
+04/19/2020 23:43:39 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:43:42 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:43:42 - INFO - __main__ -   ***** Running evaluation checkpoint-12500 *****
+04/19/2020 23:43:42 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:43:42 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.65it/s]
+04/19/2020 23:44:05 - INFO - __main__ -   ***** Eval results checkpoint-12500 is test:False *****
+04/19/2020 23:44:05 - INFO - __main__ -     eval_acc = 0.49974398361495137
+04/19/2020 23:44:05 - INFO - __main__ -     eval_loss = 1.4154694204427758
+04/19/2020 23:44:06 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-1500/config.json
+04/19/2020 23:44:06 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:44:10 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:44:10 - INFO - __main__ -   ***** Running evaluation checkpoint-1500 *****
+04/19/2020 23:44:10 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:44:10 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:44:33 - INFO - __main__ -   ***** Eval results checkpoint-1500 is test:False *****
+04/19/2020 23:44:33 - INFO - __main__ -     eval_acc = 0.4869431643625192
+04/19/2020 23:44:33 - INFO - __main__ -     eval_loss = 1.121667639576659
+04/19/2020 23:44:33 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-2000/config.json
+04/19/2020 23:44:33 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:44:37 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:44:38 - INFO - __main__ -   ***** Running evaluation checkpoint-2000 *****
+04/19/2020 23:44:38 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:44:38 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.65it/s]
+04/19/2020 23:45:01 - INFO - __main__ -   ***** Eval results checkpoint-2000 is test:False *****
+04/19/2020 23:45:01 - INFO - __main__ -     eval_acc = 0.5028161802355351
+04/19/2020 23:45:01 - INFO - __main__ -     eval_loss = 1.0764844473527402
+04/19/2020 23:45:01 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-2500/config.json
+04/19/2020 23:45:01 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:45:05 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:45:05 - INFO - __main__ -   ***** Running evaluation checkpoint-2500 *****
+04/19/2020 23:45:05 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:45:05 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:45:28 - INFO - __main__ -   ***** Eval results checkpoint-2500 is test:False *****
+04/19/2020 23:45:28 - INFO - __main__ -     eval_acc = 0.5079365079365079
+04/19/2020 23:45:28 - INFO - __main__ -     eval_loss = 1.0589538594897911
+04/19/2020 23:45:29 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-3000/config.json
+04/19/2020 23:45:29 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:45:33 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:45:33 - INFO - __main__ -   ***** Running evaluation checkpoint-3000 *****
+04/19/2020 23:45:33 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:45:33 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:45:56 - INFO - __main__ -   ***** Eval results checkpoint-3000 is test:False *****
+04/19/2020 23:45:56 - INFO - __main__ -     eval_acc = 0.5023041474654378
+04/19/2020 23:45:56 - INFO - __main__ -     eval_loss = 1.0971519768238067
+04/19/2020 23:45:57 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-3500/config.json
+04/19/2020 23:45:57 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:46:01 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:46:01 - INFO - __main__ -   ***** Running evaluation checkpoint-3500 *****
+04/19/2020 23:46:01 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:46:01 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:46:24 - INFO - __main__ -   ***** Eval results checkpoint-3500 is test:False *****
+04/19/2020 23:46:24 - INFO - __main__ -     eval_acc = 0.5207373271889401
+04/19/2020 23:46:24 - INFO - __main__ -     eval_loss = 1.0560241773420451
+04/19/2020 23:46:25 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-4000/config.json
+04/19/2020 23:46:25 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:46:33 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:46:33 - INFO - __main__ -   ***** Running evaluation checkpoint-4000 *****
+04/19/2020 23:46:33 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:46:33 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:46:56 - INFO - __main__ -   ***** Eval results checkpoint-4000 is test:False *****
+04/19/2020 23:46:56 - INFO - __main__ -     eval_acc = 0.5038402457757296
+04/19/2020 23:46:56 - INFO - __main__ -     eval_loss = 1.050277759955854
+04/19/2020 23:46:57 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-4500/config.json
+04/19/2020 23:46:57 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:47:01 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:47:02 - INFO - __main__ -   ***** Running evaluation checkpoint-4500 *****
+04/19/2020 23:47:02 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:47:02 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.63it/s]
+04/19/2020 23:47:25 - INFO - __main__ -   ***** Eval results checkpoint-4500 is test:False *****
+04/19/2020 23:47:25 - INFO - __main__ -     eval_acc = 0.504352278545827
+04/19/2020 23:47:25 - INFO - __main__ -     eval_loss = 1.1986444265258556
+04/19/2020 23:47:25 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-500/config.json
+04/19/2020 23:47:25 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:47:29 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:47:30 - INFO - __main__ -   ***** Running evaluation checkpoint-500 *****
+04/19/2020 23:47:30 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:47:30 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:47:53 - INFO - __main__ -   ***** Eval results checkpoint-500 is test:False *****
+04/19/2020 23:47:53 - INFO - __main__ -     eval_acc = 0.4536610343061956
+04/19/2020 23:47:53 - INFO - __main__ -     eval_loss = 1.0953505486858135
+04/19/2020 23:47:53 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-5000/config.json
+04/19/2020 23:47:53 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:47:58 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:47:58 - INFO - __main__ -   ***** Running evaluation checkpoint-5000 *****
+04/19/2020 23:47:58 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:47:58 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.63it/s]
+04/19/2020 23:48:21 - INFO - __main__ -   ***** Eval results checkpoint-5000 is test:False *****
+04/19/2020 23:48:21 - INFO - __main__ -     eval_acc = 0.5033282130056324
+04/19/2020 23:48:21 - INFO - __main__ -     eval_loss = 1.163101181083796
+04/19/2020 23:48:21 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-5500/config.json
+04/19/2020 23:48:21 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:48:26 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:48:26 - INFO - __main__ -   ***** Running evaluation checkpoint-5500 *****
+04/19/2020 23:48:26 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:48:26 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:48:49 - INFO - __main__ -   ***** Eval results checkpoint-5500 is test:False *****
+04/19/2020 23:48:49 - INFO - __main__ -     eval_acc = 0.5130568356374808
+04/19/2020 23:48:49 - INFO - __main__ -     eval_loss = 1.1194439722567189
+04/19/2020 23:48:49 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-6000/config.json
+04/19/2020 23:48:49 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:48:53 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:48:54 - INFO - __main__ -   ***** Running evaluation checkpoint-6000 *****
+04/19/2020 23:48:54 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:48:54 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:49:17 - INFO - __main__ -   ***** Eval results checkpoint-6000 is test:False *****
+04/19/2020 23:49:17 - INFO - __main__ -     eval_acc = 0.504352278545827
+04/19/2020 23:49:17 - INFO - __main__ -     eval_loss = 1.1443250758307322
+04/19/2020 23:49:17 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-6500/config.json
+04/19/2020 23:49:17 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:49:21 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:49:22 - INFO - __main__ -   ***** Running evaluation checkpoint-6500 *****
+04/19/2020 23:49:22 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:49:22 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:49:45 - INFO - __main__ -   ***** Eval results checkpoint-6500 is test:False *****
+04/19/2020 23:49:45 - INFO - __main__ -     eval_acc = 0.49974398361495137
+04/19/2020 23:49:45 - INFO - __main__ -     eval_loss = 1.1745173460366776
+04/19/2020 23:49:45 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-7000/config.json
+04/19/2020 23:49:45 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:49:49 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:49:50 - INFO - __main__ -   ***** Running evaluation checkpoint-7000 *****
+04/19/2020 23:49:50 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:49:50 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.63it/s]
+04/19/2020 23:50:13 - INFO - __main__ -   ***** Eval results checkpoint-7000 is test:False *****
+04/19/2020 23:50:13 - INFO - __main__ -     eval_acc = 0.5053763440860215
+04/19/2020 23:50:13 - INFO - __main__ -     eval_loss = 1.038540556966042
+04/19/2020 23:50:13 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-7500/config.json
+04/19/2020 23:50:13 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+04/19/2020 23:50:17 - INFO - __main__ -   Loading features from cached file socialiqa-train-dev/cached_dev_bert-base-uncased_128
+04/19/2020 23:50:17 - INFO - __main__ -   ***** Running evaluation checkpoint-7500 *****
+04/19/2020 23:50:17 - INFO - __main__ -     Num examples = 1953
+04/19/2020 23:50:17 - INFO - __main__ -     Batch size = 8
+Evaluating: 100% 245/245 [00:23<00:00, 10.64it/s]
+04/19/2020 23:50:40 - INFO - __main__ -   ***** Eval results checkpoint-7500 is test:False *****
+04/19/2020 23:50:40 - INFO - __main__ -     eval_acc = 0.5023041474654378
+04/19/2020 23:50:40 - INFO - __main__ -     eval_loss = 1.1187889372815891
+04/19/2020 23:50:41 - INFO - transformers.configuration_utils -   loading configuration file output_sqa_sanitycheck_2/checkpoint-8000/config.json
+04/19/2020 23:50:41 - INFO - transformers.configuration_utils -   Model config BertConfig {
+  "_num_labels": 3,
+  "architectures": [
+    "BertForMultipleChoice"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bad_words_ids": null,
+  "bos_token_id": null,
+  "decoder_start_token_id": null,
+  "do_sample": false,
+  "early_stopping": false,
+  "eos_token_id": null,
+  "finetuning_task": null,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "is_encoder_decoder": false,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_norm_eps": 1e-12,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 512,
+  "min_length": 0,
+  "model_type": "bert",
+  "no_repeat_ngram_size": 0,
+  "num_attention_heads": 12,
+  "num_beams": 1,
+  "num_hidden_layers": 12,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 0,
+  "prefix": null,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "task_specific_params": null,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 2,
+  "use_bfloat16": false,
+  "vocab_size": 30522
+}
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/dist-packages/transformers/modeling_utils.py", line 516, in from_pretrained
+    state_dict = torch.load(resolved_archive_file, map_location="cpu")
+  File "/usr/local/lib/python3.6/dist-packages/torch/serialization.py", line 526, in load
+    if _is_zipfile(opened_file):
+  File "/usr/local/lib/python3.6/dist-packages/torch/serialization.py", line 76, in _is_zipfile
+    if ord(magic_byte) != ord(read_byte):
+TypeError: ord() expected a character, but string of length 0 found
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "run_sqa_cs.py", line 652, in <module>
+    main()
+  File "run_sqa_cs.py", line 623, in main
+    model = model_class.from_pretrained(checkpoint)
+  File "/usr/local/lib/python3.6/dist-packages/transformers/modeling_utils.py", line 519, in from_pretrained
+    "Unable to load weights from pytorch checkpoint file. "
+OSError: Unable to load weights from pytorch checkpoint file. If you tried to load a PyTorch model from a TF 2.0 checkpoint, please set from_tf=True. 

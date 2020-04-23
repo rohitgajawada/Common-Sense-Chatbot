@@ -24,7 +24,7 @@ from transformers import (
     XLNetTokenizer,
     get_linear_schedule_with_warmup,
 )
-from sqa_loader import convert_examples_to_features, SQAProcessor
+from sqa_loader_cs import convert_examples_to_features, SQAProcessor
 
 
 try:
@@ -165,11 +165,9 @@ def train(args, train_dataset, model, tokenizer):
                 model.zero_grad()
                 global_step += 1
 
-                if args.local_rank in [-1, 0] and args.logging_steps > 0 and global_step % args.logging_steps == 0:
+                if args.logging_steps > 0 and global_step % args.logging_steps == 0:
                     # Log metrics
-                    if (
-                        args.local_rank == -1 and args.evaluate_during_training
-                    ):  # Only evaluate when single GPU otherwise metrics may not average well
+                    if (args.evaluate_during_training):
                         results = evaluate(args, model, tokenizer)
                         for key, value in results.items():
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
@@ -186,6 +184,14 @@ def train(args, train_dataset, model, tokenizer):
                                     str(results_test["eval_loss"]),
                                     str(global_step),
                                 )
+
+                        file0 = open("train_eval_logs_sqa_blah.txt", "a") 
+                        file0.write(str(results["eval_acc"]) + ','\
+                        + str(results["eval_loss"]) + "," + \
+                        str(global_step) + "\n") 
+                        file0.close()
+
+
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
                     tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
                     logger.info(
@@ -193,6 +199,13 @@ def train(args, train_dataset, model, tokenizer):
                         str((tr_loss - logging_loss) / args.logging_steps),
                         str(global_step),
                     )
+                    
+
+                    file1 = open("train_loss_logs_sqa_blah.txt", "a")  # append mode 
+                    file1.write(str((tr_loss - logging_loss) / args.logging_steps) + "," + \
+                    str(global_step) + "\n") 
+                    file1.close() 
+
                     logging_loss = tr_loss
 
                 if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
@@ -323,6 +336,7 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, test=False):
             str(args.max_seq_length),
         ),
     )
+    print("HELLO: " + str(cached_features_file))
     if os.path.exists(cached_features_file) and not args.overwrite_cache:
         logger.info("Loading features from cached file %s", cached_features_file)
         features = torch.load(cached_features_file)
@@ -565,6 +579,20 @@ def main():
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
 
+    # import torch.nn as nn
+
+    # # print(model)
+
+    # def convert_dropout(model):
+    #     for child_name, child in model.named_children():
+    #         if isinstance(child, nn.Dropout):
+    #             setattr(model, child_name, nn.Dropout(p=0.5))
+    #         else:
+    #             convert_dropout(child)
+
+    # convert_dropout(model)
+    # print(model)
+
     if args.local_rank == 0:
         torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
 
@@ -605,10 +633,12 @@ def main():
     # Evaluation
     results = {}
     if args.do_eval and args.local_rank in [-1, 0]:
-        if not args.do_train:
-            args.output_dir = args.model_name_or_path
+        # if not args.do_train:
+        #     args.output_dir = args.model_name_or_path
         checkpoints = [args.output_dir]
         if args.eval_all_checkpoints:
+            print(args.output_dir)
+            print(glob.glob(args.output_dir + "/**/" , recursive=True))
             checkpoints = list(
                 os.path.dirname(c) for c in sorted(glob.glob(args.output_dir + "/**/" + WEIGHTS_NAME, recursive=True))
             )

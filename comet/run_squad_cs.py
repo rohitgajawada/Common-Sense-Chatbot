@@ -424,7 +424,7 @@ def evaluate(args, model, tokenizer, prefix=""):
 
 def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=False):
     # COMET model setting up
-    device = "cpu"
+    device = "0"
     comet_model = "pretrained_models/atomic_pretrained_model.pickle"
     sampling_algo = "beam-2"
     opt, state_dict = interactive.load_model_file(comet_model)

@@ -159,17 +159,84 @@ class SQAProcessor(DataProcessor):
         
         return lines, labels
 
+    def augment(self, article, dl, nlp, model, sampler, text_encoder):
+        # category = [""]
+        entity_list = nlp(article)
+        input_event = article
+
+        category_list = ["xNeed", "xIntent", "xWant", "xReact"]
+
+        for category in category_list:
+          replaced = []
+          replacement_list = ["PersonX", "PersonY"]
+          r = 0
+          for entity in entity_list.ents:
+
+              replaced += [entity.text]
+              
+              input_event = input_event.replace(entity.text, replacement_list[r])
+              r += 1
+              if(r == 2):
+                  break
+
+          outputs = interactive.get_atomic_sequence(
+              input_event, model, sampler, dl, text_encoder, category)
+          for key in outputs:
+              prefix = ""
+              if(key[0] == "o"):
+                  if(key == "oEffect"):
+                      prefix = " Everyone else "
+                  elif (key == "oReact"):
+                      prefix = "They are "
+                  elif(key == "oWant"):
+                      prefix = "They want "
+              else:
+                  if(len(replaced)!= 0):
+                      prefix = replaced[0]
+                  else:
+                      prefix = "Person"
+                  if(key == "xAttr"):
+                      prefix += " is "
+                  elif(key == "xEffect"):
+                      prefix += " "
+                  elif(key == "xIntent"):
+                      prefix += " intends "
+                  elif(key == "xReact"):
+                      prefix += " is "
+                  elif(key == "xNeed"):
+                      prefix += " needs "
+                  elif(key == "xWant"):
+                      prefix += " wants "
+                  
+              for j in range(5):
+                  
+                  if(outputs[key]["beams"][j] != 'none'):
+                      comet_inf = outputs[key]["beams"][j] 
+                      if(len(replaced) > 0):
+                          comet_inf = comet_inf.replace("personx", replaced[0])
+                          if(len(replaced) > 1):
+                              comet_inf = comet_inf.replace("persony", replaced[1])
+
+                      article += prefix + (comet_inf) + ". "
+                      break
+        
+        # print(article)
+        # print("---------")
+        # assert 1 == 0
+        return article
+
     def _create_examples(self, lines, labels, is_training):
         """Creates examples for the training and dev sets."""
         # if type == "train" and lines[0][-1] != "label":
         #     raise ValueError("For training, the input file must contain a label column.")
-        device = "cpu"
+        device = 0
         comet_model = "pretrained_models/atomic_pretrained_model.pickle"
         sampling_algo = "beam-5"
         opt, state_dict = interactive.load_model_file(comet_model)
 
         data_loader, text_encoder = interactive.load_data("atomic", opt)
 
+        # data_loader.max_event = 30
         n_ctx = data_loader.max_event + data_loader.max_effect
         n_vocab = len(text_encoder.encoder) + n_ctx
         model = interactive.make_model(opt, n_vocab, n_ctx, state_dict)
@@ -183,78 +250,51 @@ class SQAProcessor(DataProcessor):
         else:
             cfg.device = "cpu"
         
+        # import pdb; pdb.set_trace()
+        # print(model)
+        # cuda_check = model.is_cuda
+        # if cuda_check:
+        #     print("im on the gpu bro")
+
         sampling_algorithm = sampling_algo
 
         sampler = interactive.set_sampler(opt, sampling_algorithm, data_loader)
-
-        def augment(article):
-            category = "all"
-            entity_list = nlp(article)
-            input_event = article
-            replaced = []
-            replacement_list = ["PersonX", "PersonY"]
-            r = 0
-            for entity in entity_list.ents:
-    
-                replaced += [entity.text]
-                
-                input_event = input_event.replace(entity.text, replacement_list[r])
-                r += 1
-                if(r == 2):
-                    break
-
-            outputs = interactive.get_atomic_sequence(
-                input_event, model, sampler, data_loader, text_encoder, category)
-            for key in outputs:
-                prefix = ""
-                if(key[0] == "o"):
-                    if(key == "oEffect"):
-                        prefix = " Everyone else "
-                    elif (key == "oReact"):
-                        prefix = "They are "
-                    elif(key == "oWant"):
-                        prefix = "They want "
-                else:
-                    if(len(replaced)!= 0):
-                        prefix = replaced[0]
-                    else:
-                        prefix = "Person"
-                    if(key == "xAttr"):
-                        prefix += " is "
-                    elif(key == "xEffect"):
-                        prefix += " "
-                    elif(key == "xIntent"):
-                        prefix += " intends "
-                    elif(key == "xReact"):
-                        prefix += " is "
-                    elif(key == "xNeed"):
-                        prefix += " needs "
-                    elif(key == "xWant"):
-                        prefix += " wants "
-                    
-                for j in range(5):
-                    
-                    if(outputs[key]["beams"][j] != 'none'):
-                        comet_inf = outputs[key]["beams"][j] 
-                        if(len(replaced) > 0):
-                            comet_inf = comet_inf.replace("personx", replaced[0])
-                            if(len(replaced) > 1):
-                                comet_inf = comet_inf.replace("persony", replaced[1])
-
-                        article += prefix + (comet_inf) + ". "
-                        break
-            
-            return article
-        
 
         examples = []
         # print(lines[5]["context"])
         # print("jere")
         # aug_context = augment(lines[5]["context"])
-        for i in range(len(lines)):
+        FAIL_COUNT = 0
+
+        data_loader.max_event = 17
+        wentToPast = False
+        
+        i = 0
+        while(i < len(lines) - 1):
+        # while(i < 5530):
+            if i % 50 == 0:
+              print("WTF: ", i)
             # print(lines[i]["context"])
-            aug_context = augment(lines[i]["context"])
-            examples += [
+            # import pdb; pdb.set_trace()
+
+            new_context = lines[i]["context"].split()[:30]
+            new_context = ' '.join(new_context)
+
+            # print("KIRBY: ", new_context)
+
+            # aug_context = augment(new_context)
+            
+
+            # if wentToPast:
+            #   data_loader.max_event = 17
+            #   wentToPast = False
+
+            try:
+              # print("HERE; ", data_loader.max_event, len(examples))
+              aug_context = self.augment(new_context, data_loader, nlp, model, sampler, text_encoder)
+              # print("HI FRIENDS")
+
+              examples += [
                 SQA( input_id = str(i),
                     contexts = aug_context,
                     question = lines[i]["question"],
@@ -263,7 +303,25 @@ class SQAProcessor(DataProcessor):
                     choice_3 = lines[i]["answerC"],
                     label = str(int(labels[i])-1) 
                 ) 
-            ]
+              ]
+
+              i = i + 1
+              # data_loader.max_event = 17
+              # print(len(examples))
+
+            except: 
+              wentToPast = True
+              FAIL_COUNT += 1
+              # print("Bruh I failed, help me redeem myself: " + lines[i]["context"])
+              # print(FAIL_COUNT)
+              # print("length of failed sentence")
+
+              # data_loader.max_event = 17
+              # i -= 1  
+
+            
+
+        print("TOTAL EXAMPLES TODAY IS: ", len(examples))
         return examples
 
 
