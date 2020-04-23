@@ -1,0 +1,11 @@
+torch
+spacy
+torchsampler
+torchvision
+transformers
+numpy
+tqdm
+timeit
+tensorflow
+tensorflow_datasets
+tensorboardX
