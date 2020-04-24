@@ -152,7 +152,6 @@ For whichever experiment # you set in ```config/atomic/changes.json``` (e.g., 0,
 ```
 python src/main.py --experiment_type atomic --experiment_num #
 ```
-  ```
   7. To train the model using SocialIQA and inferences from commonsense, run the following command from the comet directory:
   ```
   python run_sqa_cs.py \
