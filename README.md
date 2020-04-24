@@ -34,16 +34,16 @@ pip install -r requirements.txt
 ```
 
 ## Dataset Downloads
-1. SQuAD data can be downloaded from the links given below and should be saved in $SQUAD_DIR directory:\  
+1. SQuAD data can be downloaded from the links given below and should be saved in $SQUAD_DIR directory:    
 [train-v1.1.json](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json)  
 [dev-v1.1.json](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json)
-2.  From the link given below, download the 'The Stanford Sentiment Treebank' dataset and save in $SST_DIR directory:\  
+2.  From the link given below, download the 'The Stanford Sentiment Treebank' dataset and save in $SST_DIR directory:    
 [SST-2](https://gluebenchmark.com/tasks)
-3.  From the link given below, download the 'MultiNLI Matched' dataset and save in $MNLI_DIR directory:\  
+3.  From the link given below, download the 'MultiNLI Matched' dataset and save in $MNLI_DIR directory:    
 [MNLI](https://gluebenchmark.com/tasks)
-4. SocialIQA data can be downloaded from the link given below:\  
+4. SocialIQA data can be downloaded from the link given below:    
 [SocialIQA](https://storage.googleapis.com/ai2-mosaic/public/socialiqa/socialiqa-train-dev.zip)
-5. ATOMIC data can be downloaded from the link given below:\  
+5. ATOMIC data can be downloaded from the link given below:    
 [ATOMIC](https://homes.cs.washington.edu/~msap/atomic/data/atomic_data.tgz)
 ## Instructions to run code
 1. To train the Question Answering model using the SQuAD dataset, run the following command from the main directory:
