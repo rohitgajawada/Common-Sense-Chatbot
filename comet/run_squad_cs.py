@@ -450,23 +450,66 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
 
     def augment(article):
         context = (article.numpy().decode('UTF-8'))
-        category = "all"
-        entity_list = nlp(context)
-        input_event = context
-        replacement_list = ["PersonX", "PersonY", "PersonZ"]
-        r = 0
-        for entity in entity_list.ents:
-            if entity.label_ == 'PERSON' or entity.label_ == 'NORP':
-                input_event = input_event.replace(entity.text, replacement_list[r])
-                r += 1
-                if(r == 3):
-                    break
 
-        outputs = interactive.get_atomic_sequence(
-            input_event, model, sampler, data_loader, text_encoder, category)
+        category_list = ["xNeed", "xIntent", "xWant", "xReact"]
 
-        for key in outputs:
-            article = context + ((outputs[key]["beams"][0]))
+        for category in category_list:
+
+          entity_list = nlp(context)
+          input_event = context
+          replaced = []
+          replacement_list = ["PersonX", "PersonY", "PersonZ"]
+          r = 0
+          for entity in entity_list.ents:
+              if entity.label_ == 'PERSON' or entity.label_ == 'NORP':
+                  input_event = input_event.replace(entity.text, replacement_list[r])
+                  r += 1
+                  if(r == 3):
+                      break
+
+          outputs = interactive.get_atomic_sequence(
+              input_event, model, sampler, data_loader, text_encoder, category)
+
+          for key in outputs:
+
+              prefix = ""
+              if(key[0] == "o"):
+                  if(key == "oEffect"):
+                      prefix = " Everyone else "
+                  elif (key == "oReact"):
+                      prefix = "They are "
+                  elif(key == "oWant"):
+                      prefix = "They want "
+              else:
+                  if(len(replaced)!= 0):
+                      prefix = replaced[0]
+                  else:
+                      prefix = "Person"
+                  if(key == "xAttr"):
+                      prefix += " is "
+                  elif(key == "xEffect"):
+                      prefix += " "
+                  elif(key == "xIntent"):
+                      prefix += " intends "
+                  elif(key == "xReact"):
+                      prefix += " is "
+                  elif(key == "xNeed"):
+                      prefix += " needs "
+                  elif(key == "xWant"):
+                      prefix += " wants "
+
+              for j in range(5):
+                  
+                  if(outputs[key]["beams"][j] != 'none'):
+                      comet_inf = outputs[key]["beams"][j] 
+                      if(len(replaced) > 0):
+                          comet_inf = comet_inf.replace("personx", replaced[0])
+                          if(len(replaced) > 1):
+                              comet_inf = comet_inf.replace("persony", replaced[1])
+
+                      article += prefix + (comet_inf) + ". "
+                      break
+
         return article
 
     def process_example(example):

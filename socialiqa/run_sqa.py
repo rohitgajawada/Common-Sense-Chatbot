@@ -86,8 +86,8 @@ def train(args, train_dataset, model, tokenizer):
         },
         {"params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], "weight_decay": 0.0},
     ]
-    # optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate, eps=args.adam_epsilon)
-    optimizer = AdamW(model.pooler.named_parameters(), lr=args.learning_rate, eps=args.adam_epsilon)
+    optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate, eps=args.adam_epsilon)
+    
     scheduler = get_linear_schedule_with_warmup(
         optimizer, num_warmup_steps=args.warmup_steps, num_training_steps=t_total
     )
@@ -186,7 +186,7 @@ def train(args, train_dataset, model, tokenizer):
                                     str(global_step),
                                 )
 
-                        file0 = open("train_eval_logs.txt", "a") 
+                        file0 = open("train_eval_logs_FIXED_TL.txt", "a") 
                         file0.write(str(results["eval_acc"]) + ','\
                         + str(results["eval_loss"]) + "," + \
                         str(global_step) + "\n") 
@@ -202,7 +202,7 @@ def train(args, train_dataset, model, tokenizer):
                     )
                     
 
-                    file1 = open("train_loss_logs.txt", "a")  # append mode 
+                    file1 = open("train_loss_logs_FIXED_TL.txt", "a")  # append mode 
                     file1.write(str((tr_loss - logging_loss) / args.logging_steps) + "," + \
                     str(global_step) + "\n") 
                     file1.close() 
@@ -579,17 +579,17 @@ def main():
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
 
-    import torch.nn as nn
+    # import torch.nn as nn
 
-    x = nn.Linear(768, 768)
-    y = nn.Linear(768, 768)
-    z = nn.Linear(768, 768)
-    tanh = nn.Tanh()
+    # x = nn.Linear(768, 768)
+    # y = nn.Linear(768, 768)
+    # z = nn.Linear(768, 768)
+    # tanh = nn.Tanh()
 
-    new_pooler = nn.Sequential(x, tanh, y, tanh, z, tanh)
+    # new_pooler = nn.Sequential(x, tanh, y, tanh, z, tanh)
 
-    model.pooler = new_pooler
-    print(model)
+    # model.pooler = new_pooler
+    # print(model)
 
 
     if args.local_rank == 0:

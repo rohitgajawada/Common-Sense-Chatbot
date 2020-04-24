@@ -185,7 +185,7 @@ def train(args, train_dataset, model, tokenizer):
                                     str(global_step),
                                 )
 
-                        file0 = open("train_eval_logs_sqa_blah.txt", "a") 
+                        file0 = open("train_eval_logs_sqa_FIXED_180_tl.txt", "a") 
                         file0.write(str(results["eval_acc"]) + ','\
                         + str(results["eval_loss"]) + "," + \
                         str(global_step) + "\n") 
@@ -201,7 +201,7 @@ def train(args, train_dataset, model, tokenizer):
                     )
                     
 
-                    file1 = open("train_loss_logs_sqa_blah.txt", "a")  # append mode 
+                    file1 = open("train_loss_logs_sqa_FIXED_180_tl.txt", "a")  # append mode 
                     file1.write(str((tr_loss - logging_loss) / args.logging_steps) + "," + \
                     str(global_step) + "\n") 
                     file1.close() 
@@ -262,6 +262,9 @@ def evaluate(args, model, tokenizer, prefix="", test=False):
     nb_eval_steps = 0
     preds = None
     out_label_ids = None
+
+    # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
     for batch in tqdm(eval_dataloader, desc="Evaluating"):
         model.eval()
         batch = tuple(t.to(args.device) for t in batch)
@@ -277,6 +280,10 @@ def evaluate(args, model, tokenizer, prefix="", test=False):
             }
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
+
+            # import pdb; pdb.set_trace()
+            # print(tokenizer.decode_plus(inputs["input_ids"][2][0]))
+            # assert 1 == 0
 
             eval_loss += tmp_eval_loss.mean().item()
         nb_eval_steps += 1
@@ -336,7 +343,7 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, test=False):
             str(args.max_seq_length),
         ),
     )
-    print("HELLO: " + str(cached_features_file))
+    print("HELLO HERE: " + str(cached_features_file))
     if os.path.exists(cached_features_file) and not args.overwrite_cache:
         logger.info("Loading features from cached file %s", cached_features_file)
         features = torch.load(cached_features_file)
@@ -581,7 +588,7 @@ def main():
 
     # import torch.nn as nn
 
-    # # print(model)
+    print(model)
 
     # def convert_dropout(model):
     #     for child_name, child in model.named_children():
@@ -650,6 +657,7 @@ def main():
 
             model = model_class.from_pretrained(checkpoint)
             model.to(args.device)
+            print("LOADED: ", checkpoint)
             result = evaluate(args, model, tokenizer, prefix=prefix)
             result = dict((k + "_{}".format(global_step), v) for k, v in result.items())
             results.update(result)

@@ -154,7 +154,7 @@ class SQAProcessor(DataProcessor):
         #     raise ValueError("For training, the input file must contain a label column.")
 
         examples = []
-        for i in range(len(lines)):
+        for i in range(len(lines) - 2):
             examples += [
                 SQA( input_id = str(i),
                     contexts = lines[i]["context"],
@@ -191,14 +191,19 @@ def convert_examples_to_features(
         if ex_index % 10000 == 0:
             print("Writing example %d of %d" % (ex_index, len(examples)))
         choices_features = []
-        for choice_idx, (context, choices) in enumerate(zip(example.contexts, example.choices)):
-            text_a = context
+        for choices in example.choices:
+            text_a = example.contexts
             if example.question.find("_") != -1:
                 # this is for cloze question
                 text_b = example.question.replace("_", choices)
             else:
                 text_b = example.question + " " + choices
 
+            # print(text_a)
+            # print(text_b)
+            # print(choices)
+            # print(example.choices)
+            # assert 1 == 0
             inputs = tokenizer.encode_plus(
                 text_a, text_b, add_special_tokens=True, max_length=max_length, return_token_type_ids=True
             )

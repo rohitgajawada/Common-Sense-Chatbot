@@ -270,7 +270,8 @@ class SQAProcessor(DataProcessor):
         wentToPast = False
         
         i = 0
-        while(i < len(lines) - 1):
+        while(i < len(lines) - 2):
+        # while(i < 2):
         # while(i < 5530):
             if i % 50 == 0:
               print("WTF: ", i)
@@ -322,6 +323,7 @@ class SQAProcessor(DataProcessor):
             
 
         print("TOTAL EXAMPLES TODAY IS: ", len(examples))
+        print(examples)
         return examples
 
 
@@ -344,21 +346,49 @@ def convert_examples_to_features(
 
     features = []
     for (ex_index, example) in tqdm.tqdm(enumerate(examples), desc="convert examples to features"):
+        # print("hi1")
         # print(example)
+        # print("hi2")
+        # print(example.contexts)
         if ex_index % 10000 == 0:
             print("Writing example %d of %d" % (ex_index, len(examples)))
         choices_features = []
-        for choice_idx, (context, choices) in enumerate(zip(example.contexts, example.choices)):
-            text_a = context
+
+        # print("HELLLLL")
+        # assert 2 == 0
+
+        for choice_idx, choices in enumerate(example.choices):
+
+            # print("hi3")
+            # print(example.contexts)
+            # print(choices)
+            # print(example.choices)
+            # print(example.contexts)
+            # assert 1 == 0
+
+            text_a = example.contexts
             if example.question.find("_") != -1:
                 # this is for cloze question
                 text_b = example.question.replace("_", choices)
             else:
                 text_b = example.question + " " + choices
 
+            # print("#########")
+            # print(context)
+            # print(text_a)
+            # print(text_b)
+            # print(choices)
+            # print(example.choices)
+            # assert 1 == 0
+
             inputs = tokenizer.encode_plus(
                 text_a, text_b, add_special_tokens=True, max_length=max_length, return_token_type_ids=True
             )
+
+            # print(inputs)
+            # print(tokenizer.decode(inputs["input_ids"]))
+            # assert 1 == 0
+
             # if "num_truncated_tokens" in inputs and inputs["num_truncated_tokens"] > 0:
             #     print(
             #         "Attention! you are cropping tokens (swag task is ok). "

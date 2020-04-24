@@ -27,15 +27,9 @@ def reader(fname1, fname2):
 
 a_1, b_1, c_1 = reader("sqa_train_loss_logs.txt", "sqa_train_eval_logs.txt")
 a_2, b_2, c_2 = reader("comet_train_loss_logs.txt", "comet_train_eval_logs.txt")
-a_3, b_3, c_3 = reader("comet_train_loss_logs_squad_sqa.txt", "comet_train_eval_logs_squad_sqa.txt")
-              
-a_4_tmp = open("asa_eval_scores.txt")
-b_4_tmp = open("asa_eval_losses.txt")
-c_4_tmp = open("asa_train_losses.txt")
+a_3, b_3, c_3 = reader("train_loss_logs_squad_sqa.txt", "train_eval_logs_squad_sqa.txt")
+a_4, b_4, c_4 = reader("comet_train_loss_logs_squad_sqa.txt", "comet_train_eval_logs_squad_sqa.txt")
 
-a_4 = [float(v) for v in a_4_tmp.readlines()]
-b_4 = [float(v) for v in b_4_tmp.readlines()]
-c_4 = [float(v) for v in c_4_tmp.readlines()]
 
 lenx = min(len(a_1), len(a_2), len(a_3), len(a_4))
 x_vals = [i*500 for i in range(lenx)]
