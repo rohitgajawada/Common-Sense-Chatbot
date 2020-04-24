@@ -7,6 +7,18 @@ The goal of this prject was to assess the extent to which commonsense reasoning 
 .
 +- Common-Sense-QA
    +- comet
+   |  +- src
+   |  |  +- main.py
+   |  +- config
+   |  |  +- atomic
+   |  |     +- changes.json
+   |  +- scripts
+   |  |  +- data
+   |  |  |  +- make_atomic_data_loader.py
+   |  |  +-setup
+   |  |     +- get_atomic_data.sh
+   |  |     +- get_conceptnet_data.sh
+   |  |     +- get_model_files.sh
    |  +- load_data.py
    |  +- parameters_names.json
    |  +- run_sqa_cs.py
@@ -123,7 +135,22 @@ python run_sqa.py \
   --overwrite_output_dir \
   --output_dir output_sqa_run_100epochs/ 
   ```
-  6. To train the QA model using SQuAD and inferences from commonsense, run the following command from the comet directory:
+  6. To generate inferences from ATOMIC:  
+  Run the setup scripts from the comet directory to acquire the pretrained model files from OpenAI, as well as the ATOMIC dataset:
+```
+bash scripts/setup/get_atomic_data.sh
+bash scripts/setup/get_model_files.sh
+```
+Run the following script to pre-initialize a data loader for ATOMIC:
+```
+python scripts/data/make_atomic_data_loader.py
+```
+For running the ATOMIC experiment:  
+For whichever experiment # you set in ```config/atomic/changes.json``` (e.g., 0, 1, 2, etc.), run:
+```
+python src/main.py --experiment_type atomic --experiment_num #
+```
+  7. To train the QA model using SQuAD and inferences from commonsense, run the following command from the comet directory:
 ```
 python run_squad_cs.py \
   --model_type bert \
@@ -139,7 +166,7 @@ python run_squad_cs.py \
   --doc_stride 128 \
   --output_dir /tmp/debug_squad/
   ```
-  7. To train the model using SocialIQA and inferences from commonsense, run the following command from the comet directory:
+  8. To train the model using SocialIQA and inferences from commonsense, run the following command from the comet directory:
   ```
   python run_sqa_cs.py \
   --model_type bert \
@@ -152,7 +179,7 @@ python run_squad_cs.py \
   --overwrite_output_dir \
   --output_dir output_sqa_run_100epochs/
   ```
-  8. For running the SQuAD to SocialIQA transfer learning experiment, first train the model on SQuAD (as given in step 1 above) and copy a checkpoint (we have used checkpoint-14000) from ```/tmp/debug_squad``` to the main directory.
+  9. For running the SQuAD to SocialIQA transfer learning experiment, first train the model on SQuAD (as given in step 1 above) and copy a checkpoint (we have used checkpoint-14000) from ```/tmp/debug_squad``` to the main directory.
   Run the following command from the main directory:
   ```
 python run_sqa.py \
