@@ -1,0 +1,14 @@
+torch
+spacy
+torchsampler
+torchvision
+transformers
+numpy
+tqdm
+pandas
+ipython
+ftfy==5.1
+timeit
+tensorflow
+tensorflow_datasets
+tensorboardX
