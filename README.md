@@ -107,7 +107,7 @@ python run_glue.py \
   ```
   4. To train the multitask model on SQuAD, SST-2 and MNLI, run the following command from the main directory:
 ```
-python run_squad.py \
+python run_squad_sst_mnli.py \
   --model_type bert \
   --model_name_or_path bert-base-uncased \
   --do_train \
